@@ -80,7 +80,7 @@ const DreamScrollPWA: React.FC = () => {
   useEffect(() => {
     const checkAudioSupport = async () => {
       try {
-        if (typeof navigator !== 'undefined' && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        if (typeof navigator !== 'undefined' && navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function') {
           setAudioSupported(true);
         } else {
           setAudioSupported(false);
