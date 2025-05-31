@@ -28,6 +28,8 @@ export default function DreamScrollPWA() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
   const [audioSupported, setAudioSupported] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [speechRecognition, setSpeechRecognition] = useState<any>(null);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const recordingIntervalRef = useRef<any>(null);
   
@@ -67,47 +69,37 @@ export default function DreamScrollPWA() {
         console.log('🔍 Checking audio support...');
         
         try {
-          // Check if MediaDevices API is available
+          // Check for Web Speech API first (more reliable for speech recognition)
+          const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+          
+          if (SpeechRecognition) {
+            console.log('✅ Web Speech API available');
+            const recognition = new SpeechRecognition();
+            setSpeechRecognition(recognition);
+            setAudioSupported(true);
+            return;
+          }
+          
+          // Fallback to MediaRecorder
           if (!navigator.mediaDevices) {
             console.log('❌ MediaDevices API not available');
             setAudioSupported(false);
             return;
           }
           
-          // Check if getUserMedia is available
           if (typeof navigator.mediaDevices.getUserMedia !== 'function') {
             console.log('❌ getUserMedia not available');
             setAudioSupported(false);
             return;
           }
           
-          // Check if MediaRecorder is available
           if (typeof MediaRecorder === 'undefined') {
             console.log('❌ MediaRecorder not available');
             setAudioSupported(false);
             return;
           }
           
-          // Check if any audio MIME types are supported
-          const audioMimeTypes = [
-            'audio/webm;codecs=opus',
-            'audio/webm',
-            'audio/mp4',
-            'audio/ogg;codecs=opus'
-          ];
-          
-          const supportedMimeType = audioMimeTypes.find(mimeType => 
-            MediaRecorder.isTypeSupported(mimeType)
-          );
-          
-          if (!supportedMimeType) {
-            console.log('❌ No supported audio MIME types');
-            setAudioSupported(false);
-            return;
-          }
-          
-          console.log('✅ Audio support detected');
-          console.log('📼 Supported MIME type:', supportedMimeType);
+          console.log('✅ MediaRecorder support detected');
           setAudioSupported(true);
           
         } catch (error) {
@@ -132,25 +124,7 @@ export default function DreamScrollPWA() {
   };
 
   const testVoiceFunction = () => {
-    console.log('=== VOICE TEST ===');
-    
-    if (!isRecording) {
-      setIsRecording(true);
-      setRecordingTimer(0);
-      
-      recordingIntervalRef.current = setInterval(() => {
-        setRecordingTimer(prev => prev + 1);
-      }, 1000);
-    } else {
-      setIsRecording(false);
-      setRecordingTimer(0);
-      if (recordingIntervalRef.current) {
-        clearInterval(recordingIntervalRef.current);
-        recordingIntervalRef.current = null;
-      }
-      
-      processAudioToText();
-    }
+    // TEST button removed - only real recording now
   };
 
   const processAudioToText = () => {
@@ -164,147 +138,227 @@ export default function DreamScrollPWA() {
   };
 
   const startRealRecording = async () => {
-    console.log('🎤 Starting real microphone recording...');
+    console.log('🎤 Starting voice recognition...');
     
     if (!audioSupported) {
       console.log('❌ Audio not supported');
-      alert('Audio recording not supported in this browser. Please use Chrome, Firefox, or Safari, or try the TEST button.');
+      alert('Voice recording not supported in this browser. Please use Chrome, Firefox, or Safari.');
       return;
     }
 
     try {
-      console.log('🔍 Requesting microphone access...');
-      
-      // Request microphone permission with specific constraints
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-          sampleRate: 44100
-        } 
-      });
-      
-      console.log('✅ Microphone access granted');
-      
-      // Check MediaRecorder support
-      const mimeTypes = [
-        'audio/webm;codecs=opus',
-        'audio/webm',
-        'audio/mp4',
-        'audio/ogg;codecs=opus'
-      ];
-      
-      let selectedMimeType = '';
-      for (const mimeType of mimeTypes) {
-        if (MediaRecorder.isTypeSupported(mimeType)) {
-          selectedMimeType = mimeType;
-          console.log('📼 Using MIME type:', mimeType);
-          break;
-        }
+      // Try Web Speech API first (best for speech recognition)
+      if (speechRecognition) {
+        console.log('🗣️ Using Web Speech API');
+        startSpeechRecognition();
+        return;
       }
       
-      if (!selectedMimeType) {
-        throw new Error('No supported audio format found');
-      }
-      
-      // Create MediaRecorder
-      const recorder = new MediaRecorder(stream, { 
-        mimeType: selectedMimeType,
-        audioBitsPerSecond: 128000
-      });
-      
-      const audioChunks: Blob[] = [];
-      
-      recorder.ondataavailable = (event) => {
-        console.log('📊 Audio chunk received:', event.data.size, 'bytes');
-        if (event.data.size > 0) {
-          audioChunks.push(event.data);
-        }
-      };
-      
-      recorder.onstop = () => {
-        console.log('⏹️ Recording stopped, processing audio...');
-        
-        // Create audio blob
-        const audioBlob = new Blob(audioChunks, { type: selectedMimeType });
-        console.log('🔊 Final audio blob size:', audioBlob.size, 'bytes');
-        
-        // Stop all tracks to release microphone
-        stream.getTracks().forEach(track => {
-          track.stop();
-          console.log('🔇 Audio track stopped');
-        });
-        
-        // Process the audio (for now, simulate transcription)
-        processRealAudio(audioBlob);
-      };
-      
-      recorder.onerror = (event) => {
-        console.error('❌ MediaRecorder error:', event);
-        alert('Recording error occurred. Please try again or use the TEST button.');
-        setIsRecording(false);
-        
-        // Clean up
-        stream.getTracks().forEach(track => track.stop());
-      };
-      
-      recorder.onstart = () => {
-        console.log('▶️ Recording started successfully');
-      };
-      
-      // Start recording with data collection every second
-      recorder.start(1000);
-      setMediaRecorder(recorder);
-      setIsRecording(true);
-      setRecordingTimer(0);
-      
-      // Start timer
-      recordingIntervalRef.current = setInterval(() => {
-        setRecordingTimer(prev => {
-          const newTime = prev + 1;
-          console.log('⏱️ Recording time:', newTime + 's');
-          return newTime;
-        });
-      }, 1000);
-      
-      console.log('🎙️ Recording started successfully');
+      // Fallback to MediaRecorder
+      console.log('🎙️ Using MediaRecorder fallback');
+      await startMediaRecorder();
       
     } catch (error: any) {
-      console.error('❌ Microphone access error:', error);
-      
-      let errorMessage = 'Microphone access failed. ';
-      
-      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-        errorMessage += 'Please allow microphone access in your browser settings and try again.';
-      } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
-        errorMessage += 'No microphone found. Please connect a microphone and try again.';
-      } else if (error.name === 'NotSupportedError') {
-        errorMessage += 'Audio recording not supported in this browser. Please try Chrome, Firefox, or Safari.';
-      } else if (error.name === 'NotReadableError') {
-        errorMessage += 'Microphone is already in use by another application.';
-      } else {
-        errorMessage += 'Please check your microphone settings and try again.';
-      }
-      
-      alert(errorMessage + '\n\nYou can use the TEST button as an alternative.');
-      setAudioSupported(false);
+      console.error('❌ Recording failed:', error);
+      alert('Voice recording failed. Please check your microphone permissions and try again.');
       setIsRecording(false);
     }
   };
 
-  const stopRealRecording = () => {
-    console.log('🛑 Stopping real recording...');
+  const startSpeechRecognition = () => {
+    if (!speechRecognition) return;
     
-    if (mediaRecorder) {
-      if (mediaRecorder.state === 'recording') {
-        console.log('⏹️ Calling mediaRecorder.stop()');
-        mediaRecorder.stop();
-      } else {
-        console.log('ℹ️ MediaRecorder not in recording state:', mediaRecorder.state);
+    console.log('🎯 Starting Speech Recognition');
+    
+    // Configure speech recognition
+    speechRecognition.continuous = true;
+    speechRecognition.interimResults = true;
+    speechRecognition.lang = 'en-US';
+    speechRecognition.maxAlternatives = 1;
+    
+    let finalTranscript = '';
+    let interimTranscript = '';
+    
+    speechRecognition.onstart = () => {
+      console.log('✅ Speech recognition started');
+      setIsRecording(true);
+      setIsListening(true);
+      setRecordingTimer(0);
+      
+      recordingIntervalRef.current = setInterval(() => {
+        setRecordingTimer(prev => prev + 1);
+      }, 1000);
+    };
+    
+    speechRecognition.onresult = (event: any) => {
+      interimTranscript = '';
+      
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript + ' ';
+          console.log('📝 Final transcript chunk:', transcript);
+        } else {
+          interimTranscript += transcript;
+          console.log('🔄 Interim transcript:', transcript);
+        }
       }
-    } else {
-      console.log('❌ No mediaRecorder found');
+      
+      // Update the text area with current transcription
+      const currentText = finalTranscript + interimTranscript;
+      if (currentText.trim()) {
+        setDreamText(currentText.trim());
+      }
+    };
+    
+    speechRecognition.onend = () => {
+      console.log('⏹️ Speech recognition ended');
+      setIsRecording(false);
+      setIsListening(false);
+      
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current);
+        recordingIntervalRef.current = null;
+      }
+      
+      // Use the final transcript
+      if (finalTranscript.trim()) {
+        console.log('✅ Final transcription:', finalTranscript);
+        setDreamText(finalTranscript.trim());
+      } else if (!dreamText.trim()) {
+        console.log('ℹ️ No speech detected');
+        alert('No speech was detected. Please try speaking louder or closer to your microphone.');
+      }
+    };
+    
+    speechRecognition.onerror = (event: any) => {
+      console.error('❌ Speech recognition error:', event.error);
+      setIsRecording(false);
+      setIsListening(false);
+      
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current);
+        recordingIntervalRef.current = null;
+      }
+      
+      let errorMessage = 'Speech recognition failed. ';
+      switch (event.error) {
+        case 'no-speech':
+          errorMessage += 'No speech was detected. Please try again.';
+          break;
+        case 'audio-capture':
+          errorMessage += 'No microphone found or permission denied.';
+          break;
+        case 'not-allowed':
+          errorMessage += 'Please allow microphone access and try again.';
+          break;
+        case 'network':
+          errorMessage += 'Network error. Please check your internet connection.';
+          break;
+        default:
+          errorMessage += 'Please try again.';
+      }
+      
+      alert(errorMessage);
+    };
+    
+    // Start recognition
+    speechRecognition.start();
+  };
+
+  const startMediaRecorder = async () => {
+    console.log('🔍 Requesting microphone access...');
+    
+    const stream = await navigator.mediaDevices.getUserMedia({ 
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+        sampleRate: 44100
+      } 
+    });
+    
+    console.log('✅ Microphone access granted');
+    
+    const mimeTypes = [
+      'audio/webm;codecs=opus',
+      'audio/webm',
+      'audio/mp4',
+      'audio/ogg;codecs=opus'
+    ];
+    
+    let selectedMimeType = '';
+    for (const mimeType of mimeTypes) {
+      if (MediaRecorder.isTypeSupported(mimeType)) {
+        selectedMimeType = mimeType;
+        break;
+      }
+    }
+    
+    if (!selectedMimeType) {
+      throw new Error('No supported audio format found');
+    }
+    
+    const recorder = new MediaRecorder(stream, { 
+      mimeType: selectedMimeType,
+      audioBitsPerSecond: 128000
+    });
+    
+    const audioChunks: Blob[] = [];
+    
+    recorder.ondataavailable = (event) => {
+      if (event.data.size > 0) {
+        audioChunks.push(event.data);
+      }
+    };
+    
+    recorder.onstop = () => {
+      console.log('⏹️ MediaRecorder stopped');
+      
+      const audioBlob = new Blob(audioChunks, { type: selectedMimeType });
+      console.log('🔊 Audio blob size:', audioBlob.size, 'bytes');
+      
+      stream.getTracks().forEach(track => track.stop());
+      
+      // For MediaRecorder, we'll need to implement speech-to-text service
+      // For now, inform user that transcription isn't available
+      if (audioBlob.size > 1000) {
+        alert('Audio recorded successfully, but automatic transcription requires a speech-to-text service. Please type your dream manually.');
+      } else {
+        alert('No audio was recorded. Please check your microphone and try again.');
+      }
+    };
+    
+    recorder.onerror = (event) => {
+      console.error('❌ MediaRecorder error:', event);
+      stream.getTracks().forEach(track => track.stop());
+      throw new Error('Recording failed');
+    };
+    
+    recorder.start(1000);
+    setMediaRecorder(recorder);
+    setIsRecording(true);
+    setRecordingTimer(0);
+    
+    recordingIntervalRef.current = setInterval(() => {
+      setRecordingTimer(prev => prev + 1);
+    }, 1000);
+  };
+
+  const stopRealRecording = () => {
+    console.log('🛑 Stopping recording...');
+    
+    // Stop speech recognition if active
+    if (speechRecognition && isListening) {
+      console.log('⏹️ Stopping speech recognition');
+      speechRecognition.stop();
+    }
+    
+    // Stop media recorder if active
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      console.log('⏹️ Stopping media recorder');
+      mediaRecorder.stop();
     }
     
     // Clear timer
@@ -314,6 +368,7 @@ export default function DreamScrollPWA() {
     }
     
     setIsRecording(false);
+    setIsListening(false);
     setRecordingTimer(0);
   };
 
@@ -541,45 +596,51 @@ export default function DreamScrollPWA() {
                     <button
                       onClick={isRecording ? stopRealRecording : startRealRecording}
                       disabled={!audioSupported}
-                      className={`w-20 h-20 rounded-full flex items-center justify-center transition-all ${
+                      className={`w-24 h-24 rounded-full flex items-center justify-center transition-all shadow-lg ${
                         isRecording 
-                          ? 'bg-red-500 animate-pulse' 
+                          ? 'bg-red-500 animate-pulse shadow-red-500/50' 
                           : audioSupported
-                          ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600'
+                          ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 shadow-purple-500/50'
                           : 'bg-gray-500 cursor-not-allowed'
                       }`}
+                      title={audioSupported ? (isRecording ? 'Stop Recording' : 'Start Voice Recording') : 'Microphone not available'}
                     >
-                      {isRecording ? <MicOff className="w-8 h-8" /> : <Mic className="w-8 h-8" />}
-                    </button>
-                    
-                    <button
-                      onClick={testVoiceFunction}
-                      className="w-16 h-16 rounded-full bg-yellow-500 hover:bg-yellow-600 flex items-center justify-center text-xs font-bold transition-all"
-                    >
-                      TEST
+                      {isRecording ? <MicOff className="w-10 h-10" /> : <Mic className="w-10 h-10" />}
                     </button>
                   </div>
                   
                   <div className="text-center">
                     <p className="text-purple-200 mb-2">
                       {isRecording 
-                        ? `🎤 Recording... ${formatTime(recordingTimer)}` 
+                        ? `🎤 ${isListening ? 'Listening' : 'Recording'}... ${formatTime(recordingTimer)}` 
                         : audioSupported 
-                        ? 'Click microphone to record or TEST to simulate'
-                        : 'Microphone not available - use TEST or type below'
+                        ? 'Click the microphone to start voice recording'
+                        : 'Voice recording not available - please type your dream below'
                       }
                     </p>
                     {isRecording && (
-                      <div className="flex justify-center space-x-1 mb-2">
-                        <div className="w-2 h-2 bg-red-400 rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-red-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                        <div className="w-2 h-2 bg-red-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                      <div className="space-y-2">
+                        <div className="flex justify-center space-x-1 mb-2">
+                          <div className="w-2 h-2 bg-red-400 rounded-full animate-bounce"></div>
+                          <div className="w-2 h-2 bg-red-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                          <div className="w-2 h-2 bg-red-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                        </div>
+                        {isListening && (
+                          <p className="text-green-300 text-sm">
+                            🗣️ Speak now - your words will appear below
+                          </p>
+                        )}
                       </div>
                     )}
                     {isProcessing && (
                       <div className="text-yellow-300">
                         <Sparkles className="w-5 h-5 mx-auto animate-spin mb-1" />
                         <p className="text-sm">Converting speech to text...</p>
+                      </div>
+                    )}
+                    {!audioSupported && (
+                      <div className="text-orange-300 text-sm mt-2">
+                        <p>💡 Voice recording requires Chrome, Firefox, or Safari</p>
                       </div>
                     )}
                   </div>
