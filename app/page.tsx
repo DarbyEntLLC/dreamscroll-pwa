@@ -237,7 +237,39 @@ const DreamScrollPWA: React.FC = () => {
     }, 2000);
   };
 
-  const generateInterpretation = async (dreamContent: string) => {
+  // For debugging - let's add a simple test button
+  const testVoiceRecording = () => {
+    console.log('=== VOICE RECORDING TEST ===');
+    console.log('Audio supported:', audioSupported);
+    console.log('Navigator available:', typeof navigator !== 'undefined');
+    console.log('MediaDevices available:', navigator?.mediaDevices ? 'Yes' : 'No');
+    console.log('getUserMedia available:', typeof navigator?.mediaDevices?.getUserMedia === 'function');
+    
+    if (!isRecording) {
+      console.log('Starting test recording...');
+      setIsRecording(true);
+      setRecordingTimer(0);
+      
+      // Skip actual recording, just simulate the process
+      recordingIntervalRef.current = setInterval(() => {
+        setRecordingTimer(prev => prev + 1);
+      }, 1000);
+      
+      console.log('Test recording started (simulated)');
+    } else {
+      console.log('Stopping test recording...');
+      setIsRecording(false);
+      setRecordingTimer(0);
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current);
+        recordingIntervalRef.current = null;
+      }
+      
+      // Directly trigger text processing
+      console.log('Triggering text processing...');
+      processAudioToText(new Blob());
+    }
+  };
     setIsProcessing(true);
     
     setTimeout(() => {
@@ -576,7 +608,7 @@ const DreamScrollPWA: React.FC = () => {
             </h3>
             
             <div className="space-y-4">
-              <div className="flex justify-center">
+              <div className="flex justify-center space-x-4">
                 <button
                   onClick={isRecording ? stopRealRecording : startRealRecording}
                   disabled={!audioSupported}
@@ -589,6 +621,15 @@ const DreamScrollPWA: React.FC = () => {
                   }`}
                 >
                   {isRecording ? <MicOff className="w-8 h-8" /> : <Mic className="w-8 h-8" />}
+                </button>
+                
+                {/* Debug test button */}
+                <button
+                  onClick={testVoiceRecording}
+                  className="w-16 h-16 rounded-full bg-yellow-500 flex items-center justify-center text-xs font-bold"
+                  title="Test Recording (Debug)"
+                >
+                  TEST
                 </button>
               </div>
               
@@ -621,14 +662,20 @@ const DreamScrollPWA: React.FC = () => {
                   value={dreamText}
                   onChange={(e) => setDreamText(e.target.value)}
                   placeholder="Type your dream here or use voice recording above..."
-                  className="w-full bg-white/5 border border-white/20 rounded-2xl p-4 text-white placeholder-white/50 min-h-32 resize-none focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20 transition-all"
+                  className="w-full bg-gray-800 border border-gray-600 rounded-2xl p-4 text-white placeholder-gray-400 min-h-32 resize-none focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20 transition-all"
                   disabled={isRecording}
+                  style={{
+                    backgroundColor: '#1f2937',
+                    color: '#ffffff',
+                    borderColor: '#4b5563'
+                  }}
                 />
                 {dreamText.trim() && !isProcessing && !isRecording && (
                   <button
                     onClick={() => {
-                      generateInterpretation(dreamText);
+                      const textToProcess = dreamText;
                       setDreamText('');
+                      generateInterpretation(textToProcess);
                     }}
                     className="absolute bottom-4 right-4 bg-gradient-to-r from-purple-500 to-pink-500 p-2 rounded-full hover:from-purple-600 hover:to-pink-600 transition-all transform hover:scale-105 shadow-lg"
                   >
