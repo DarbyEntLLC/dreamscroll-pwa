@@ -21,14 +21,14 @@ interface Dream {
 type ScreenType = 'onboarding' | 'home' | 'input' | 'journal' | 'dreamDetail' | 'interpretation' | 'trends' | 'profile';
 
 export default function DreamScrollPWA() {
-  const [currentScreen, setCurrentScreen] = useState('onboarding');
+  const [currentScreen, setCurrentScreen] = useState<ScreenType>('onboarding');
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTimer, setRecordingTimer] = useState(0);
   const [dreamText, setDreamText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
   const [audioSupported, setAudioSupported] = useState(false);
-  const [dreams, setDreams] = useState([
+  const [dreams, setDreams] = useState<Dream[]>([
     {
       id: 1,
       title: "Flying Over Mountains",
@@ -52,7 +52,7 @@ export default function DreamScrollPWA() {
       biblicalRefs: ["Genesis 2:8", "Revelation 22:2", "John 15:5"]
     }
   ]);
-  const [selectedDream, setSelectedDream] = useState(null);
+  const [selectedDream, setSelectedDream] = useState<Dream | null>(null);
   const recordingIntervalRef = useRef(null);
 
   useEffect(() => {
