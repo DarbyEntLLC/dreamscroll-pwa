@@ -118,7 +118,7 @@ export default function DreamScrollPWA() {
     }, 2000);
   };
 
-  const generateInterpretation = (dreamContent) => {
+  const generateInterpretation = (dreamContent: string) => {
     setIsProcessing(true);
     
     setTimeout(() => {
@@ -156,7 +156,7 @@ export default function DreamScrollPWA() {
     }, 3000);
   };
 
-  const formatTime = (seconds) => {
+  const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
