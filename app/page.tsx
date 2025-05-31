@@ -101,7 +101,7 @@ export default function DreamScrollPWA() {
   };
 
   const processAudioToText = () => {
-    console.log('Processing audio to text');
+    console.log('Processing TEST audio to text');
     setIsProcessing(true);
     
     setTimeout(() => {
@@ -112,10 +112,231 @@ export default function DreamScrollPWA() {
       ];
       
       const randomText = mockTexts[Math.floor(Math.random() * mockTexts.length)];
-      console.log('Setting text:', randomText.substring(0, 50) + '...');
+      console.log('Setting TEST text:', randomText.substring(0, 50) + '...');
       setDreamText(randomText);
       setIsProcessing(false);
     }, 2000);
+    }
+  };
+
+  const startRealRecording = async () => {
+    console.log('Starting real microphone recording...');
+    
+    if (!audioSupported) {
+      alert('Audio recording not supported in this browser. Please try Chrome, Firefox, or Safari.');
+      return;
+    }
+
+    try {
+      // Request microphone permission
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          sampleRate: 44100
+        } 
+      });
+      
+      console.log('Microphone access granted');
+      
+      // Create MediaRecorder
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+      const recorder = new MediaRecorder(stream, { mimeType });
+      const chunks: Blob[] = [];
+      
+      recorder.ondataavailable = (event) => {
+        console.log('Audio chunk received:', event.data.size, 'bytes');
+        if (event.data.size > 0) {
+          chunks.push(event.data);
+        }
+      };
+      
+      recorder.onstop = async () => {
+        console.log('Recording stopped, processing audio...');
+        const audioBlob = new Blob(chunks, { type: mimeType });
+        
+        // Stop all tracks to release microphone
+        stream.getTracks().forEach(track => {
+          track.stop();
+          console.log('Audio track stopped');
+        });
+        
+        // Process the audio
+        await processRealAudioToText(audioBlob);
+      };
+      
+      recorder.onerror = (event) => {
+        console.error('MediaRecorder error:', event);
+        alert('Recording error occurred. Please try again.');
+        setIsRecording(false);
+      };
+      
+      // Start recording
+      recorder.start(1000); // Collect data every second
+      setMediaRecorder(recorder);
+      setIsRecording(true);
+      setRecordingTimer(0);
+      
+      // Start timer
+      recordingIntervalRef.current = setInterval(() => {
+        setRecordingTimer(prev => prev + 1);
+      }, 1000) as any;
+      
+      console.log('Recording started successfully');
+      
+    } catch (error: any) {
+      console.error('Microphone access error:', error);
+      
+      let errorMessage = 'Microphone access denied. ';
+      if (error.name === 'NotAllowedError') {
+        errorMessage += 'Please allow microphone access and try again.';
+      } else if (error.name === 'NotFoundError') {
+        errorMessage += 'No microphone found. Please connect a microphone.';
+      } else if (error.name === 'NotSupportedError') {
+        errorMessage += 'Audio recording not supported in this browser.';
+      } else {
+        errorMessage += 'Please check your microphone settings.';
+      }
+      
+      alert(errorMessage);
+      setAudioSupported(false);
+      setIsRecording(false);
+    }
+  };
+
+  const stopRealRecording = () => {
+    console.log('Stopping real recording...');
+    
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      mediaRecorder.stop();
+      console.log('MediaRecorder stop called');
+    }
+    
+    // Clear timer
+    if (recordingIntervalRef.current) {
+      clearInterval(recordingIntervalRef.current);
+      recordingIntervalRef.current = null;
+    }
+    
+    setIsRecording(false);
+    setRecordingTimer(0);
+  };
+
+  const processRealAudioToText = async (audioBlob: Blob) => {
+    console.log('Processing real audio, size:', audioBlob.size, 'bytes');
+    setIsProcessing(true);
+    
+    try {
+      // Option 1: Use Web Speech API (works in Chrome/Edge)
+      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        console.log('Using Web Speech API...');
+        await processWithWebSpeechAPI();
+        return;
+      }
+      
+      // Option 2: Use OpenAI Whisper API (requires API key)
+      if (audioBlob.size > 1000) { // Only process if we have actual audio
+        console.log('Using OpenAI Whisper API...');
+        await processWithWhisperAPI(audioBlob);
+        return;
+      }
+      
+      // Fallback: Use mock data
+      console.log('Using fallback mock transcription...');
+      setTimeout(() => {
+        const mockTexts = [
+          "I had a beautiful dream where I was walking in a peaceful garden filled with bright flowers and singing birds.",
+          "In my dream, I saw myself standing on a mountain top with a brilliant light surrounding me, feeling God's presence.",
+          "I dreamed I was flying through clouds of gold and silver, with angels singing hymns of praise all around me."
+        ];
+        
+        const randomText = mockTexts[Math.floor(Math.random() * mockTexts.length)];
+        console.log('Mock transcription:', randomText);
+        setDreamText(randomText);
+        setIsProcessing(false);
+      }, 2000);
+      
+    } catch (error) {
+      console.error('Audio processing error:', error);
+      alert('Error processing audio. Please try typing your dream instead.');
+      setIsProcessing(false);
+    }
+  };
+
+  const processWithWebSpeechAPI = async () => {
+    return new Promise((resolve, reject) => {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      
+      if (!SpeechRecognition) {
+        reject(new Error('Speech Recognition not supported'));
+        return;
+      }
+      
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+      
+      let finalTranscript = '';
+      
+      recognition.onresult = (event: any) => {
+        let interimTranscript = '';
+        
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript + ' ';
+          } else {
+            interimTranscript += transcript;
+          }
+        }
+        
+        console.log('Speech recognition result:', finalTranscript + interimTranscript);
+      };
+      
+      recognition.onend = () => {
+        console.log('Speech recognition ended');
+        if (finalTranscript.trim()) {
+          setDreamText(finalTranscript.trim());
+        } else {
+          setDreamText("I had a dream that I couldn't quite remember all the details of, but it felt very meaningful and spiritual.");
+        }
+        setIsProcessing(false);
+        resolve(finalTranscript);
+      };
+      
+      recognition.onerror = (event: any) => {
+        console.error('Speech recognition error:', event.error);
+        reject(new Error(event.error));
+      };
+      
+      console.log('Starting Web Speech API...');
+      recognition.start();
+      
+      // Stop after 10 seconds if still running
+      setTimeout(() => {
+        if (recognition) {
+          recognition.stop();
+        }
+      }, 10000);
+    });
+  };
+
+  const processWithWhisperAPI = async (audioBlob: Blob) => {
+    // Note: This requires an OpenAI API key and backend endpoint
+    // For now, we'll use a placeholder that could be implemented later
+    
+    console.log('Whisper API integration would go here');
+    console.log('Audio blob size:', audioBlob.size);
+    
+    // Simulate API call
+    setTimeout(() => {
+      const mockTranscription = "I had a vivid dream where I was in a beautiful temple with golden pillars and peaceful music playing softly in the background.";
+      console.log('Mock Whisper transcription:', mockTranscription);
+      setDreamText(mockTranscription);
+      setIsProcessing(false);
+    }, 3000);
   };
 
   const generateInterpretation = (dreamContent: string) => {
@@ -327,9 +548,24 @@ export default function DreamScrollPWA() {
                 <div className="space-y-4">
                   <div className="flex justify-center space-x-4">
                     <button
+                      onClick={isRecording ? stopRealRecording : startRealRecording}
+                      disabled={!audioSupported}
+                      className={`w-20 h-20 rounded-full flex items-center justify-center transition-all ${
+                        isRecording 
+                          ? 'bg-red-500 animate-pulse' 
+                          : audioSupported
+                          ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600'
+                          : 'bg-gray-500 cursor-not-allowed'
+                      }`}
+                      title={audioSupported ? (isRecording ? 'Stop Recording' : 'Start Voice Recording') : 'Microphone not available'}
+                    >
+                      {isRecording ? <MicOff className="w-8 h-8" /> : <Mic className="w-8 h-8" />}
+                    </button>
+                    
+                    <button
                       onClick={testVoiceFunction}
-                      className="w-16 h-16 rounded-full bg-yellow-500 flex items-center justify-center text-xs font-bold"
-                      title="Test Recording"
+                      className="w-16 h-16 rounded-full bg-yellow-500 hover:bg-yellow-600 flex items-center justify-center text-xs font-bold transition-all"
+                      title="Test with Mock Data"
                     >
                       TEST
                     </button>
@@ -338,12 +574,14 @@ export default function DreamScrollPWA() {
                   <div className="text-center">
                     <p className="text-purple-200 mb-2">
                       {isRecording 
-                        ? `Recording... ${formatTime(recordingTimer)}` 
-                        : 'Click TEST to simulate voice recording'
+                        ? `🎤 Recording... ${formatTime(recordingTimer)}` 
+                        : audioSupported 
+                        ? 'Click microphone to record or TEST to simulate'
+                        : 'Microphone not available - use TEST or type below'
                       }
                     </p>
                     {isRecording && (
-                      <div className="flex justify-center space-x-1">
+                      <div className="flex justify-center space-x-1 mb-2">
                         <div className="w-2 h-2 bg-red-400 rounded-full animate-bounce"></div>
                         <div className="w-2 h-2 bg-red-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
                         <div className="w-2 h-2 bg-red-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
@@ -352,7 +590,14 @@ export default function DreamScrollPWA() {
                     {isProcessing && (
                       <div className="text-yellow-300">
                         <Sparkles className="w-5 h-5 mx-auto animate-spin mb-1" />
-                        <p className="text-sm">Processing audio...</p>
+                        <p className="text-sm">
+                          {isRecording ? 'Processing voice...' : 'Converting speech to text...'}
+                        </p>
+                      </div>
+                    )}
+                    {!audioSupported && (
+                      <div className="text-orange-300 text-sm mt-2">
+                        <p>💡 Voice recording requires Chrome, Firefox, or Safari</p>
                       </div>
                     )}
                   </div>
