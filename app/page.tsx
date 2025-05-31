@@ -32,7 +32,6 @@ const DreamScrollPWA: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [isOnline, setIsOnline] = useState<boolean>(typeof navigator !== 'undefined' ? navigator.onLine : true);
   const [installPrompt, setInstallPrompt] = useState<any>(null);
-  
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [audioSupported, setAudioSupported] = useState<boolean>(false);
   
@@ -117,7 +116,6 @@ const DreamScrollPWA: React.FC = () => {
     }
   };
 
-  // Simple test function for voice recording
   const testVoiceFunction = () => {
     console.log('=== VOICE TEST ===');
     console.log('Audio supported:', audioSupported);
@@ -139,7 +137,6 @@ const DreamScrollPWA: React.FC = () => {
         recordingIntervalRef.current = null;
       }
       
-      // Trigger text processing
       processAudioToText(new Blob());
     }
   };
@@ -198,7 +195,6 @@ const DreamScrollPWA: React.FC = () => {
     if (mediaRecorder && mediaRecorder.state === 'recording') {
       mediaRecorder.stop();
     } else {
-      // Fallback - just trigger processing
       setIsRecording(false);
       processAudioToText(new Blob());
     }
@@ -229,7 +225,6 @@ const DreamScrollPWA: React.FC = () => {
       setDreamText(randomText);
       setIsProcessing(false);
       
-      // Focus text area
       setTimeout(() => {
         const textArea = document.querySelector('textarea');
         if (textArea) {
@@ -292,8 +287,7 @@ const DreamScrollPWA: React.FC = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Components
-  const PWAInstallBanner: React.FC = () => {
+  const PWAInstallBanner = () => {
     if (!installPrompt) return null;
     
     return (
@@ -325,7 +319,7 @@ const DreamScrollPWA: React.FC = () => {
     );
   };
 
-  const OfflineIndicator: React.FC = () => {
+  const OfflineIndicator = () => {
     if (isOnline) return null;
     
     return (
@@ -338,7 +332,7 @@ const DreamScrollPWA: React.FC = () => {
     );
   };
 
-  const OnboardingScreen: React.FC = () => (
+  const OnboardingScreen = () => (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex flex-col items-center justify-center p-6 text-white">
       <PWAInstallBanner />
       <OfflineIndicator />
@@ -415,7 +409,7 @@ const DreamScrollPWA: React.FC = () => {
     </div>
   );
 
-  const HomeScreen: React.FC = () => (
+  const HomeScreen = () => (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-purple-900 text-white">
       <PWAInstallBanner />
       <OfflineIndicator />
@@ -427,313 +421,7 @@ const DreamScrollPWA: React.FC = () => {
             </h1>
             <div className="flex items-center space-x-2">
               <p className="text-purple-300">Good evening, Dreamer</p>
-              {isProcessing ? (
-            <div className="flex flex-col items-center justify-center py-20">
-              <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mb-6">
-                <Brain className="w-10 h-10 animate-spin" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Analyzing Your Dream</h3>
-              <p className="text-purple-200 text-center max-w-sm">
-                Our AI is interpreting the biblical symbolism and spiritual meaning...
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6">
-                <h3 className="text-xl font-semibold mb-4 flex items-center">
-                  <Sparkles className="w-6 h-6 mr-2 text-yellow-300" />
-                  Interpretation
-                </h3>
-                <p className="text-white/90 leading-relaxed">{selectedDream.interpretation}</p>
-              </div>
-
-              <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6">
-                <h3 className="text-lg font-semibold mb-4">Biblical References</h3>
-                <div className="space-y-2">
-                  {selectedDream.biblicalRefs.map((ref, index) => (
-                    <div key={index} className="bg-blue-500/20 rounded-xl p-3">
-                      <span className="text-blue-300 font-semibold">{ref}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-4">
-                  <h4 className="font-semibold mb-3">Themes</h4>
-                  <div className="space-y-2">
-                    {selectedDream.themes.map((theme, index) => (
-                      <div key={index} className="bg-pink-500/20 text-pink-200 px-2 py-1 rounded-lg text-sm">
-                        {theme}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-4">
-                  <h4 className="font-semibold mb-3">Symbols</h4>
-                  <div className="space-y-2">
-                    {selectedDream.symbols.map((symbol, index) => (
-                      <div key={index} className="bg-purple-500/20 text-purple-200 px-2 py-1 rounded-lg text-sm">
-                        {symbol}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <button
-                onClick={() => setCurrentScreen('home')}
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 py-4 rounded-2xl font-semibold"
-              >
-                Save to Journal
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  };
-
-  const JournalScreen: React.FC = () => (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-purple-900 text-white">
-      <div className="p-6 pb-20">
-        <div className="flex items-center justify-between mb-8">
-          <button onClick={() => setCurrentScreen('home')}>
-            <ArrowLeft className="w-6 h-6" />
-          </button>
-          <h2 className="text-2xl font-bold">Dream Journal</h2>
-          <div className="w-6 h-6"></div>
-        </div>
-
-        <div className="space-y-4">
-          {dreams.map((dream) => (
-            <div
-              key={dream.id}
-              onClick={() => {
-                setSelectedDream(dream);
-                setCurrentScreen('dreamDetail');
-              }}
-              className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 cursor-pointer hover:bg-white/15 transition-all"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-lg">{dream.title}</h3>
-                <span className="text-xs text-purple-300">{dream.date}</span>
-              </div>
-              
-              <p className="text-white/70 mb-4">{dream.content.substring(0, 120)}...</p>
-              
-              <div className="flex items-center justify-between">
-                <div className="bg-purple-500/20 text-purple-200 px-2 py-1 rounded-lg text-xs">
-                  {dream.mood}
-                </div>
-                <Star className="w-5 h-5 text-yellow-400" />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-
-  const DreamDetailScreen: React.FC = () => {
-    if (!selectedDream) return <HomeScreen />;
-    
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 to-purple-900 text-white">
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-8">
-            <button onClick={() => setCurrentScreen('journal')}>
-              <ArrowLeft className="w-6 h-6" />
-            </button>
-            <h2 className="text-xl font-bold">Dream Details</h2>
-            <button
-              onClick={() => setCurrentScreen('interpretation')}
-              className="p-2 bg-white/10 rounded-full"
-            >
-              <Brain className="w-5 h-5" />
-            </button>
-          </div>
-
-          <div className="space-y-6">
-            <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6">
-              <h3 className="text-2xl font-bold mb-4">{selectedDream.title}</h3>
-              <div className="flex items-center space-x-4 mb-4">
-                <span className="text-purple-300">{selectedDream.date}</span>
-                <div className="bg-green-500/20 text-green-300 px-3 py-1 rounded-full text-sm">
-                  {selectedDream.mood}
-                </div>
-              </div>
-              <p className="text-white/90 leading-relaxed">{selectedDream.content}</p>
-            </div>
-
-            <button
-              onClick={() => setCurrentScreen('interpretation')}
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 py-3 rounded-2xl font-semibold"
-            >
-              View Full Interpretation
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const TrendsScreen: React.FC = () => (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-purple-900 text-white">
-      <div className="p-6 pb-20">
-        <div className="flex items-center justify-between mb-8">
-          <button onClick={() => setCurrentScreen('home')}>
-            <ArrowLeft className="w-6 h-6" />
-          </button>
-          <h2 className="text-2xl font-bold">Dream Trends</h2>
-          <div className="w-6 h-6"></div>
-        </div>
-
-        <div className="space-y-6">
-          <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6">
-            <h3 className="text-xl font-semibold mb-4">This Month's Insights</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white/5 rounded-2xl p-4 text-center">
-                <div className="text-3xl font-bold text-green-300 mb-1">{dreams.length}</div>
-                <div className="text-sm text-white/70">Total Dreams</div>
-              </div>
-              <div className="bg-white/5 rounded-2xl p-4 text-center">
-                <div className="text-3xl font-bold text-blue-300 mb-1">89%</div>
-                <div className="text-sm text-white/70">Avg Quality</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6">
-            <h3 className="text-lg font-semibold mb-4">Common Themes</h3>
-            <div className="space-y-3">
-              {['Spiritual Growth', 'Divine Guidance', 'Peace', 'Freedom'].map((theme, index) => (
-                <div key={theme} className="flex items-center justify-between">
-                  <span>{theme}</span>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-20 h-2 bg-white/20 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-gradient-to-r from-purple-400 to-pink-400"
-                        style={{ width: `${(4 - index) * 25}%` }}
-                      ></div>
-                    </div>
-                    <span className="text-sm text-white/70">{4 - index}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const ProfileScreen: React.FC = () => (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-purple-900 text-white">
-      <div className="p-6 pb-20">
-        <div className="flex items-center justify-between mb-8">
-          <button onClick={() => setCurrentScreen('home')}>
-            <ArrowLeft className="w-6 h-6" />
-          </button>
-          <h2 className="text-2xl font-bold">Profile</h2>
-          <div className="w-6 h-6"></div>
-        </div>
-
-        <div className="space-y-6">
-          <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6 text-center">
-            <div className="w-20 h-20 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center mx-auto mb-4">
-              <User className="w-10 h-10 text-white" />
-            </div>
-            <h3 className="text-xl font-bold mb-2">Dream Explorer</h3>
-            <p className="text-purple-300">Member since May 2025</p>
-            <div className="flex justify-center space-x-4 mt-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-300">{dreams.length}</div>
-                <div className="text-xs text-white/70">Dreams</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-300">7</div>
-                <div className="text-xs text-white/70">Day Streak</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6">
-            <h3 className="text-lg font-semibold mb-4">App Features</h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <Mic className="w-5 h-5 text-green-400" />
-                  <span>Voice Recording</span>
-                </div>
-                <div className={`w-12 h-6 rounded-full ${audioSupported ? 'bg-green-500' : 'bg-gray-500'} relative`}>
-                  <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all ${audioSupported ? 'right-0.5' : 'left-0.5'}`}></div>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <Download className="w-5 h-5 text-blue-400" />
-                  <span>PWA Installed</span>
-                </div>
-                <div className="w-12 h-6 rounded-full bg-green-500 relative">
-                  <div className="w-5 h-5 bg-white rounded-full absolute top-0.5 right-0.5"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {installPrompt && (
-            <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-3xl p-6">
-              <h3 className="text-lg font-semibold mb-2">Install DreamScroll</h3>
-              <p className="text-white/80 mb-4">Add to your home screen for the best experience</p>
-              <button
-                onClick={handleInstallPWA}
-                className="w-full bg-white/20 py-3 rounded-2xl font-semibold"
-              >
-                📱 Install Now
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderScreen = () => {
-    switch (currentScreen) {
-      case 'onboarding':
-        return <OnboardingScreen />;
-      case 'home':
-        return <HomeScreen />;
-      case 'input':
-        return <DreamInputScreen />;
-      case 'journal':
-        return <JournalScreen />;
-      case 'dreamDetail':
-        return <DreamDetailScreen />;
-      case 'interpretation':
-        return <InterpretationScreen />;
-      case 'trends':
-        return <TrendsScreen />;
-      case 'profile':
-        return <ProfileScreen />;
-      default:
-        return <HomeScreen />;
-    }
-  };
-
-  return (
-    <div className="max-w-sm mx-auto bg-black min-h-screen relative overflow-hidden">
-      {renderScreen()}
-    </div>
-  );
-};
-
-export default function Home() {
-  return <DreamScrollPWA />;
-}Online ? <Wifi className="w-4 h-4 text-green-400" /> : <WifiOff className="w-4 h-4 text-yellow-400" />}
+              {isOnline ? <Wifi className="w-4 h-4 text-green-400" /> : <WifiOff className="w-4 h-4 text-yellow-400" />}
             </div>
           </div>
           <button
@@ -856,7 +544,7 @@ export default function Home() {
     </div>
   );
 
-  const DreamInputScreen: React.FC = () => (
+  const DreamInputScreen = () => (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-indigo-900 text-white">
       <OfflineIndicator />
       <div className="p-6">
@@ -955,7 +643,7 @@ export default function Home() {
     </div>
   );
 
-  const InterpretationScreen: React.FC = () => {
+  const InterpretationScreen = () => {
     if (!selectedDream) return <HomeScreen />;
     
     return (
@@ -969,4 +657,310 @@ export default function Home() {
             <div className="w-6 h-6"></div>
           </div>
 
-          {is
+          {isProcessing ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mb-6">
+                <Brain className="w-10 h-10 animate-spin" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Analyzing Your Dream</h3>
+              <p className="text-purple-200 text-center max-w-sm">
+                Our AI is interpreting the biblical symbolism and spiritual meaning...
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6">
+                <h3 className="text-xl font-semibold mb-4 flex items-center">
+                  <Sparkles className="w-6 h-6 mr-2 text-yellow-300" />
+                  Interpretation
+                </h3>
+                <p className="text-white/90 leading-relaxed">{selectedDream.interpretation}</p>
+              </div>
+
+              <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6">
+                <h3 className="text-lg font-semibold mb-4">Biblical References</h3>
+                <div className="space-y-2">
+                  {selectedDream.biblicalRefs.map((ref, index) => (
+                    <div key={index} className="bg-blue-500/20 rounded-xl p-3">
+                      <span className="text-blue-300 font-semibold">{ref}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-4">
+                  <h4 className="font-semibold mb-3">Themes</h4>
+                  <div className="space-y-2">
+                    {selectedDream.themes.map((theme, index) => (
+                      <div key={index} className="bg-pink-500/20 text-pink-200 px-2 py-1 rounded-lg text-sm">
+                        {theme}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-4">
+                  <h4 className="font-semibold mb-3">Symbols</h4>
+                  <div className="space-y-2">
+                    {selectedDream.symbols.map((symbol, index) => (
+                      <div key={index} className="bg-purple-500/20 text-purple-200 px-2 py-1 rounded-lg text-sm">
+                        {symbol}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setCurrentScreen('home')}
+                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 py-4 rounded-2xl font-semibold"
+              >
+                Save to Journal
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const JournalScreen = () => (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-purple-900 text-white">
+      <div className="p-6 pb-20">
+        <div className="flex items-center justify-between mb-8">
+          <button onClick={() => setCurrentScreen('home')}>
+            <ArrowLeft className="w-6 h-6" />
+          </button>
+          <h2 className="text-2xl font-bold">Dream Journal</h2>
+          <div className="w-6 h-6"></div>
+        </div>
+
+        <div className="space-y-4">
+          {dreams.map((dream) => (
+            <div
+              key={dream.id}
+              onClick={() => {
+                setSelectedDream(dream);
+                setCurrentScreen('dreamDetail');
+              }}
+              className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 cursor-pointer hover:bg-white/15 transition-all"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-semibold text-lg">{dream.title}</h3>
+                <span className="text-xs text-purple-300">{dream.date}</span>
+              </div>
+              
+              <p className="text-white/70 mb-4">{dream.content.substring(0, 120)}...</p>
+              
+              <div className="flex items-center justify-between">
+                <div className="bg-purple-500/20 text-purple-200 px-2 py-1 rounded-lg text-xs">
+                  {dream.mood}
+                </div>
+                <Star className="w-5 h-5 text-yellow-400" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  const DreamDetailScreen = () => {
+    if (!selectedDream) return <HomeScreen />;
+    
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 to-purple-900 text-white">
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-8">
+            <button onClick={() => setCurrentScreen('journal')}>
+              <ArrowLeft className="w-6 h-6" />
+            </button>
+            <h2 className="text-xl font-bold">Dream Details</h2>
+            <button
+              onClick={() => setCurrentScreen('interpretation')}
+              className="p-2 bg-white/10 rounded-full"
+            >
+              <Brain className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="space-y-6">
+            <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6">
+              <h3 className="text-2xl font-bold mb-4">{selectedDream.title}</h3>
+              <div className="flex items-center space-x-4 mb-4">
+                <span className="text-purple-300">{selectedDream.date}</span>
+                <div className="bg-green-500/20 text-green-300 px-3 py-1 rounded-full text-sm">
+                  {selectedDream.mood}
+                </div>
+              </div>
+              <p className="text-white/90 leading-relaxed">{selectedDream.content}</p>
+            </div>
+
+            <button
+              onClick={() => setCurrentScreen('interpretation')}
+              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 py-3 rounded-2xl font-semibold"
+            >
+              View Full Interpretation
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const TrendsScreen = () => (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-purple-900 text-white">
+      <div className="p-6 pb-20">
+        <div className="flex items-center justify-between mb-8">
+          <button onClick={() => setCurrentScreen('home')}>
+            <ArrowLeft className="w-6 h-6" />
+          </button>
+          <h2 className="text-2xl font-bold">Dream Trends</h2>
+          <div className="w-6 h-6"></div>
+        </div>
+
+        <div className="space-y-6">
+          <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6">
+            <h3 className="text-xl font-semibold mb-4">This Month's Insights</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-white/5 rounded-2xl p-4 text-center">
+                <div className="text-3xl font-bold text-green-300 mb-1">{dreams.length}</div>
+                <div className="text-sm text-white/70">Total Dreams</div>
+              </div>
+              <div className="bg-white/5 rounded-2xl p-4 text-center">
+                <div className="text-3xl font-bold text-blue-300 mb-1">89%</div>
+                <div className="text-sm text-white/70">Avg Quality</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6">
+            <h3 className="text-lg font-semibold mb-4">Common Themes</h3>
+            <div className="space-y-3">
+              {['Spiritual Growth', 'Divine Guidance', 'Peace', 'Freedom'].map((theme, index) => (
+                <div key={theme} className="flex items-center justify-between">
+                  <span>{theme}</span>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-20 h-2 bg-white/20 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-purple-400 to-pink-400"
+                        style={{ width: `${(4 - index) * 25}%` }}
+                      ></div>
+                    </div>
+                    <span className="text-sm text-white/70">{4 - index}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const ProfileScreen = () => (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-purple-900 text-white">
+      <div className="p-6 pb-20">
+        <div className="flex items-center justify-between mb-8">
+          <button onClick={() => setCurrentScreen('home')}>
+            <ArrowLeft className="w-6 h-6" />
+          </button>
+          <h2 className="text-2xl font-bold">Profile</h2>
+          <div className="w-6 h-6"></div>
+        </div>
+
+        <div className="space-y-6">
+          <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6 text-center">
+            <div className="w-20 h-20 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center mx-auto mb-4">
+              <User className="w-10 h-10 text-white" />
+            </div>
+            <h3 className="text-xl font-bold mb-2">Dream Explorer</h3>
+            <p className="text-purple-300">Member since May 2025</p>
+            <div className="flex justify-center space-x-4 mt-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-300">{dreams.length}</div>
+                <div className="text-xs text-white/70">Dreams</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-300">7</div>
+                <div className="text-xs text-white/70">Day Streak</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6">
+            <h3 className="text-lg font-semibold mb-4">App Features</h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <Mic className="w-5 h-5 text-green-400" />
+                  <span>Voice Recording</span>
+                </div>
+                <div className={`w-12 h-6 rounded-full ${audioSupported ? 'bg-green-500' : 'bg-gray-500'} relative`}>
+                  <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all ${audioSupported ? 'right-0.5' : 'left-0.5'}`}></div>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <Download className="w-5 h-5 text-blue-400" />
+                  <span>PWA Installed</span>
+                </div>
+                <div className="w-12 h-6 rounded-full bg-green-500 relative">
+                  <div className="w-5 h-5 bg-white rounded-full absolute top-0.5 right-0.5"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {installPrompt && (
+            <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-3xl p-6">
+              <h3 className="text-lg font-semibold mb-2">Install DreamScroll</h3>
+              <p className="text-white/80 mb-4">Add to your home screen for the best experience</p>
+              <button
+                onClick={handleInstallPWA}
+                className="w-full bg-white/20 py-3 rounded-2xl font-semibold"
+              >
+                📱 Install Now
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderScreen = () => {
+    switch (currentScreen) {
+      case 'onboarding':
+        return <OnboardingScreen />;
+      case 'home':
+        return <HomeScreen />;
+      case 'input':
+        return <DreamInputScreen />;
+      case 'journal':
+        return <JournalScreen />;
+      case 'dreamDetail':
+        return <DreamDetailScreen />;
+      case 'interpretation':
+        return <InterpretationScreen />;
+      case 'trends':
+        return <TrendsScreen />;
+      case 'profile':
+        return <ProfileScreen />;
+      default:
+        return <HomeScreen />;
+    }
+  };
+
+  return (
+    <div className="max-w-sm mx-auto bg-black min-h-screen relative overflow-hidden">
+      {renderScreen()}
+    </div>
+  );
+};
+
+export default function Home() {
+  return <DreamScrollPWA />;
+}
