@@ -65,7 +65,7 @@ export default function DreamScrollPWA() {
       window.addEventListener('offline', handleOffline);
       
       // Check audio support
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      if (navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function') {
         setAudioSupported(true);
       }
 
