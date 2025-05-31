@@ -1,223 +1,4 @@
-// Enhanced Input Screen
-  if (currentScreen === 'input') {
-    return (
-      <div className="max-w-sm mx-auto bg-gradient-to-br from-slate-900 to-indigo-900 min-h-screen">
-        <OfflineIndicator />
-        <div className="min-h-screen text-white">
-          <div className="p-6 pb-24">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-8">
-              <button 
-                onClick={() => setCurrentScreen('home')}
-                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <h2 className="text-2xl font-bold">Record Dream</h2>
-              <div className="w-10 h-10"></div>
-            </div>
-
-            {/* Recording Interface */}
-            <div className="space-y-6">
-              <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-xl">
-                <h3 className="text-lg font-semibold mb-6 flex items-center">
-                  <DreamScrollLogo size={20} className="mr-2" />
-                  Describe Your Dream
-                </h3>
-                
-                <div className="space-y-6">
-                  {/* Voice Recording Section */}
-                  <div className="text-center">
-                    <div className="relative inline-block">
-                      <button
-                        onClick={isRecording ? stopRealRecording : startRealRecording}
-                        disabled={!audioSupported}
-                        className={`w-24 h-24 rounded-full flex items-center justify-center transition-all shadow-2xl relative ${
-                          isRecording 
-                            ? 'bg-red-500 animate-pulse shadow-red-500/50 scale-110' 
-                            : audioSupported
-                            ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 shadow-purple-500/50 hover:scale-105'
-                            : 'bg-gray-500 cursor-not-allowed'
-                        }`}
-                        title={audioSupported ? (isRecording ? 'Stop Recording' : 'Start Voice Recording') : 'Microphone not available'}
-                      >
-                        {isRecording ? <MicOff className="w-10 h-10" /> : <Mic className="w-10 h-10" />}
-                        {isRecording && (
-                          <div className="absolute inset-0 rounded-full border-4 border-white/30 animate-ping"></div>
-                        )}
-                      </button>
-                    </div>
-                    
-                    <div className="mt-4">
-                      <p className="text-purple-200 mb-2 font-medium">
-                        {isRecording 
-                          ? `🎤 ${isListening ? 'Listening' : 'Recording'}... ${formatTime(recordingTimer)}` 
-                          : audioSupported 
-                          ? 'Tap the microphone to start voice recording'
-                          : 'Voice recording not available - please type your dream below'
-                        }
-                      </p>
-                      
-                      {isRecording && (
-                        <div className="space-y-3">
-                          <div className="flex justify-center space-x-1">
-                            <div className="w-2 h-2 bg-red-400 rounded-full animate-bounce"></div>
-                            <div className="w-2 h-2 bg-red-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                            <div className="w-2 h-2 bg-red-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                          </div>
-                          {isListening && (
-                            <div className="bg-green-500/20 rounded-2xl p-3 border border-green-400/30">
-                              <p className="text-green-300 text-sm font-medium">
-                                🗣️ Speak now - your words will appear below
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      
-                      {isProcessing && (
-                        <div className="bg-yellow-500/20 rounded-2xl p-3 border border-yellow-400/30">
-                          <div className="flex items-center justify-center space-x-2">
-                            <Sparkles className="w-5 h-5 text-yellow-300 animate-spin" />
-                            <p className="text-yellow-300 text-sm font-medium">Processing speech...</p>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {!audioSupported && (
-                        <div className="bg-orange-500/20 rounded-2xl p-3 border border-orange-400/30">
-                          <p className="text-orange-300 text-sm">
-                            💡 Voice recording requires Chrome, Firefox, or Safari
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Text Input */}
-                  <div className="relative">
-                    <textarea
-                      value={dreamText}
-                      onChange={(e) => setDreamText(e.target.value)}
-                      placeholder="Type your dream here or use voice recording above..."
-                      disabled={isRecording}
-                      rows={6}
-                      className="w-full p-4 rounded-2xl bg-white/10 border border-white/20 text-white placeholder-white/50 resize-none focus:outline-none focus:border-purple-400 focus:bg-white/15 transition-all backdrop-blur-sm"
-                    />
-                    {dreamText.trim() && !isProcessing && !isRecording && (
-                      <button
-                        onClick={() => {
-                          const textToProcess = dreamText;
-                          setDreamText('');
-                          generateAdvancedInterpretation(textToProcess);
-                        }}
-                        className="absolute bottom-4 right-4 bg-gradient-to-r from-purple-500 to-pink-500 p-3 rounded-full hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg hover:scale-105"
-                      >
-                        <Send className="w-5 h-5" />
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Quick Tips */}
-                  <div className="bg-blue-500/10 rounded-2xl p-4 border border-blue-400/20">
-                    <h4 className="text-blue-300 font-medium mb-2">💡 Recording Tips</h4>
-                    <ul className="text-blue-200 text-sm space-y-1">
-                      <li>• Speak clearly and at a normal pace</li>
-                      <li>• Include emotions and colors you remember</li>
-                      <li>• Describe the setting and people involved</li>
-                      <li>• Mention any symbols or unusual elements</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Enhanced Interpretation Screen
-  if (currentScreen === 'interpretation') {
-    if (!selectedDream) {
-      return <div className="max-w-sm mx-auto bg-black min-h-screen flex items-center justify-center text-white">Loading...</div>;
-    }
-    
-    return (
-      <div className="max-w-sm mx-auto bg-gradient-to-br from-slate-900 to-purple-900 min-h-screen">
-        <div className="min-h-screen text-white">
-          <div className="p-6 pb-24">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-8">
-              <button 
-                onClick={() => setCurrentScreen('home')}
-                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <h2 className="text-xl font-bold">Dream Interpretation</h2>
-              <button
-                onClick={() => shareDream(selectedDream)}
-                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
-              >
-                <Share2 className="w-5 h-5" />
-              </button>
-            </div>
-
-            {isProcessing ? (
-              <div className="flex flex-col items-center justify-center py-20">
-                <div className="w-24 h-24 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mb-6 shadow-2xl">
-                  <Brain className="w-12 h-12 animate-spin" />
-                </div>
-                <h3 className="text-2xl font-semibold mb-4">Analyzing Your Dream</h3>
-                <p className="text-purple-200 text-center max-w-sm mb-6">
-                  Our AI is interpreting the biblical symbolism and spiritual meaning...
-                </p>
-                <div className="flex space-x-2">
-                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {/* Dream Title & Stats */}
-                <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-xl">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-bold">{selectedDream.title}</h3>
-                    <button
-                      onClick={() => toggleBookmark(selectedDream.id)}
-                      className="p-2 rounded-full hover:bg-white/10 transition-colors"
-                    >
-                      <Heart className={`w-6 h-6 ${selectedDream.isBookmarked ? 'text-red-400 fill-current' : 'text-white/60'}`} />
-                    </button>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-purple-300">{selectedDream.date}</span>
-                    <div className="flex items-center space-x-2">
-                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                      <span className="text-yellow-300 font-medium">{selectedDream.confidence}% Confidence</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Interpretation */}
-                <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-xl">
-                  <h3 className="text-xl font-semibold mb-4 flex items-center">
-                    <Sparkles className="w-6 h-6 mr-2 text-yellow-300" />
-                    Interpretation
-                  </h3>
-                  <p className="text-white/90 leading-relaxed text-lg">{selectedDream.interpretation}</p>
-                </div>
-
-                {/* Themes & Mood */}
-                <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-xl">
-                  <h3 className="text-lg font-semibold mb-4">Spiritual Themes</h3>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {selectedDream.themes.map((theme, index) => (
-                      <span key={index} className="bg-purple-500/20 text-purple-200 px-3 py-2 rounded-full text-sm font-medium border border-purple-400/30">
-                        {theme}
-                      'use client';
+'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
 import { 
@@ -1089,7 +870,271 @@ export default function DreamScrollPWA() {
     );
   }
 
-  // Home Screen
+  // Enhanced Input Screen
+  if (currentScreen === 'input') {
+    return (
+      <div className="max-w-sm mx-auto bg-gradient-to-br from-slate-900 to-indigo-900 min-h-screen">
+        <OfflineIndicator />
+        <div className="min-h-screen text-white">
+          <div className="p-6 pb-24">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-8">
+              <button 
+                onClick={() => setCurrentScreen('home')}
+                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <h2 className="text-2xl font-bold">Record Dream</h2>
+              <div className="w-10 h-10"></div>
+            </div>
+
+            {/* Recording Interface */}
+            <div className="space-y-6">
+              <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-xl">
+                <h3 className="text-lg font-semibold mb-6 flex items-center">
+                  <DreamScrollLogo size={20} className="mr-2" />
+                  Describe Your Dream
+                </h3>
+                
+                <div className="space-y-6">
+                  {/* Voice Recording Section */}
+                  <div className="text-center">
+                    <div className="relative inline-block">
+                      <button
+                        onClick={isRecording ? stopRealRecording : startRealRecording}
+                        disabled={!audioSupported}
+                        className={`w-24 h-24 rounded-full flex items-center justify-center transition-all shadow-2xl relative ${
+                          isRecording 
+                            ? 'bg-red-500 animate-pulse shadow-red-500/50 scale-110' 
+                            : audioSupported
+                            ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 shadow-purple-500/50 hover:scale-105'
+                            : 'bg-gray-500 cursor-not-allowed'
+                        }`}
+                        title={audioSupported ? (isRecording ? 'Stop Recording' : 'Start Voice Recording') : 'Microphone not available'}
+                      >
+                        {isRecording ? <MicOff className="w-10 h-10" /> : <Mic className="w-10 h-10" />}
+                        {isRecording && (
+                          <div className="absolute inset-0 rounded-full border-4 border-white/30 animate-ping"></div>
+                        )}
+                      </button>
+                    </div>
+                    
+                    <div className="mt-4">
+                      <p className="text-purple-200 mb-2 font-medium">
+                        {isRecording 
+                          ? `🎤 ${isListening ? 'Listening' : 'Recording'}... ${formatTime(recordingTimer)}` 
+                          : audioSupported 
+                          ? 'Tap the microphone to start voice recording'
+                          : 'Voice recording not available - please type your dream below'
+                        }
+                      </p>
+                      
+                      {isRecording && (
+                        <div className="space-y-3">
+                          <div className="flex justify-center space-x-1">
+                            <div className="w-2 h-2 bg-red-400 rounded-full animate-bounce"></div>
+                            <div className="w-2 h-2 bg-red-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                            <div className="w-2 h-2 bg-red-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                          </div>
+                          {isListening && (
+                            <div className="bg-green-500/20 rounded-2xl p-3 border border-green-400/30">
+                              <p className="text-green-300 text-sm font-medium">
+                                🗣️ Speak now - your words will appear below
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      
+                      {isProcessing && (
+                        <div className="bg-yellow-500/20 rounded-2xl p-3 border border-yellow-400/30">
+                          <div className="flex items-center justify-center space-x-2">
+                            <Sparkles className="w-5 h-5 text-yellow-300 animate-spin" />
+                            <p className="text-yellow-300 text-sm font-medium">Processing speech...</p>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {!audioSupported && (
+                        <div className="bg-orange-500/20 rounded-2xl p-3 border border-orange-400/30">
+                          <p className="text-orange-300 text-sm">
+                            💡 Voice recording requires Chrome, Firefox, or Safari
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Text Input */}
+                  <div className="relative">
+                    <textarea
+                      value={dreamText}
+                      onChange={(e) => setDreamText(e.target.value)}
+                      placeholder="Type your dream here or use voice recording above..."
+                      disabled={isRecording}
+                      rows={6}
+                      className="w-full p-4 rounded-2xl bg-white/10 border border-white/20 text-white placeholder-white/50 resize-none focus:outline-none focus:border-purple-400 focus:bg-white/15 transition-all backdrop-blur-sm"
+                    />
+                    {dreamText.trim() && !isProcessing && !isRecording && (
+                      <button
+                        onClick={() => {
+                          const textToProcess = dreamText;
+                          setDreamText('');
+                          generateAdvancedInterpretation(textToProcess);
+                        }}
+                        className="absolute bottom-4 right-4 bg-gradient-to-r from-purple-500 to-pink-500 p-3 rounded-full hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg hover:scale-105"
+                      >
+                        <Send className="w-5 h-5" />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Quick Tips */}
+                  <div className="bg-blue-500/10 rounded-2xl p-4 border border-blue-400/20">
+                    <h4 className="text-blue-300 font-medium mb-2">💡 Recording Tips</h4>
+                    <ul className="text-blue-200 text-sm space-y-1">
+                      <li>• Speak clearly and at a normal pace</li>
+                      <li>• Include emotions and colors you remember</li>
+                      <li>• Describe the setting and people involved</li>
+                      <li>• Mention any symbols or unusual elements</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Enhanced Interpretation Screen
+  if (currentScreen === 'interpretation') {
+    if (!selectedDream) {
+      return <div className="max-w-sm mx-auto bg-black min-h-screen flex items-center justify-center text-white">Loading...</div>;
+    }
+    
+    return (
+      <div className="max-w-sm mx-auto bg-gradient-to-br from-slate-900 to-purple-900 min-h-screen">
+        <div className="min-h-screen text-white">
+          <div className="p-6 pb-24">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-8">
+              <button 
+                onClick={() => setCurrentScreen('home')}
+                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <h2 className="text-xl font-bold">Dream Interpretation</h2>
+              <button
+                onClick={() => shareDream(selectedDream)}
+                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
+              >
+                <Share2 className="w-5 h-5" />
+              </button>
+            </div>
+
+            {isProcessing ? (
+              <div className="flex flex-col items-center justify-center py-20">
+                <div className="w-24 h-24 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mb-6 shadow-2xl">
+                  <Brain className="w-12 h-12 animate-spin" />
+                </div>
+                <h3 className="text-2xl font-semibold mb-4">Analyzing Your Dream</h3>
+                <p className="text-purple-200 text-center max-w-sm mb-6">
+                  Our AI is interpreting the biblical symbolism and spiritual meaning...
+                </p>
+                <div className="flex space-x-2">
+                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
+                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {/* Dream Title & Stats */}
+                <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-xl">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-bold">{selectedDream.title}</h3>
+                    <button
+                      onClick={() => toggleBookmark(selectedDream.id)}
+                      className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                    >
+                      <Heart className={`w-6 h-6 ${selectedDream.isBookmarked ? 'text-red-400 fill-current' : 'text-white/60'}`} />
+                    </button>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-purple-300">{selectedDream.date}</span>
+                    <div className="flex items-center space-x-2">
+                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                      <span className="text-yellow-300 font-medium">{selectedDream.confidence}% Confidence</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Interpretation */}
+                <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-xl">
+                  <h3 className="text-xl font-semibold mb-4 flex items-center">
+                    <Sparkles className="w-6 h-6 mr-2 text-yellow-300" />
+                    Interpretation
+                  </h3>
+                  <p className="text-white/90 leading-relaxed text-lg">{selectedDream.interpretation}</p>
+                </div>
+
+                {/* Themes & Mood */}
+                <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-xl">
+                  <h3 className="text-lg font-semibold mb-4">Spiritual Themes</h3>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {selectedDream.themes.map((theme, index) => (
+                      <span key={index} className="bg-purple-500/20 text-purple-200 px-3 py-2 rounded-full text-sm font-medium border border-purple-400/30">
+                        {theme}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-white/70">Mood:</span>
+                    <span className="text-purple-300 font-medium">{selectedDream.mood}</span>
+                  </div>
+                </div>
+
+                {/* Biblical References */}
+                <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-xl">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center">
+                    <BookOpen className="w-5 h-5 mr-2 text-blue-300" />
+                    Biblical References
+                  </h3>
+                  <div className="space-y-4">
+                    {selectedDream.biblicalRefs.map((ref, index) => (
+                      <div key={index} className="bg-blue-500/10 rounded-2xl p-4 border border-blue-400/20">
+                        <h4 className="font-semibold text-blue-300 mb-2">{ref.verse}</h4>
+                        <p className="text-blue-200 text-sm mb-3 italic">"{ref.text}"</p>
+                        <p className="text-white/80 text-sm">{ref.relevance}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Symbols */}
+                <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-xl">
+                  <h3 className="text-lg font-semibold mb-4">Key Symbols</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedDream.symbols.map((symbol, index) => (
+                      <span key={index} className="bg-green-500/20 text-green-200 px-3 py-2 rounded-full text-sm border border-green-400/30">
+                        {symbol}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Home Screen (and all other screens continue here...)
   if (currentScreen === 'home') {
     return (
       <div className="max-w-sm mx-auto bg-gradient-to-br from-slate-900 to-purple-900 min-h-screen">
@@ -1286,3 +1331,437 @@ export default function DreamScrollPWA() {
       </div>
     );
   }
+
+  // Journal Screen
+  if (currentScreen === 'journal') {
+    return (
+      <div className="max-w-sm mx-auto bg-gradient-to-br from-slate-900 to-purple-900 min-h-screen">
+        <OfflineIndicator />
+        <div className="min-h-screen text-white">
+          <div className="p-6 pb-24">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-8">
+              <button 
+                onClick={() => setCurrentScreen('home')}
+                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <h2 className="text-2xl font-bold">Dream Journal</h2>
+              <button
+                onClick={() => setCurrentScreen('search')}
+                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
+              >
+                <Search className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Filter Tabs */}
+            <div className="flex space-x-2 mb-6">
+              {['all', 'bookmarked', 'recent'].map((filter) => (
+                <button
+                  key={filter}
+                  onClick={() => setSelectedFilter(filter)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                    selectedFilter === filter
+                      ? 'bg-purple-500 text-white'
+                      : 'bg-white/10 text-white/70 hover:bg-white/20'
+                  }`}
+                >
+                  {filter.charAt(0).toUpperCase() + filter.slice(1)}
+                </button>
+              ))}
+            </div>
+
+            {/* Dreams List */}
+            <div className="space-y-4">
+              {filteredDreams.map((dream) => (
+                <div
+                  key={dream.id}
+                  onClick={() => {
+                    setSelectedDream(dream);
+                    setCurrentScreen('interpretation');
+                  }}
+                  className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-xl cursor-pointer hover:bg-white/15 transition-all group"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-bold group-hover:text-purple-200 transition-colors">{dream.title}</h3>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleBookmark(dream.id);
+                        }}
+                        className="p-1 rounded-full hover:bg-white/10 transition-colors"
+                      >
+                        <Heart className={`w-5 h-5 ${dream.isBookmarked ? 'text-red-400 fill-current' : 'text-white/60'}`} />
+                      </button>
+                      <span className="text-sm text-purple-300">{dream.date}</span>
+                    </div>
+                  </div>
+                  
+                  <p className="text-white/80 mb-4 line-clamp-3">{dream.content}</p>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-wrap gap-2">
+                      {dream.themes.slice(0, 3).map((theme, index) => (
+                        <span key={index} className="text-xs bg-purple-500/20 text-purple-200 px-2 py-1 rounded-full">
+                          {theme}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                      <span className="text-sm text-yellow-300">{dream.confidence}%</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {filteredDreams.length === 0 && (
+              <div className="text-center py-12">
+                <Moon className="w-16 h-16 text-white/30 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-white/70 mb-2">No dreams found</h3>
+                <p className="text-white/50 mb-6">Start recording your dreams to build your spiritual journal</p>
+                <button
+                  onClick={() => setCurrentScreen('input')}
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-3 rounded-2xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all"
+                >
+                  Record First Dream
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Bottom Navigation */}
+          <div className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-xl border-t border-white/10">
+            <div className="flex items-center justify-around py-3 px-6 max-w-sm mx-auto">
+              <button
+                onClick={() => setCurrentScreen('home')}
+                className="flex flex-col items-center space-y-1 text-white/60 hover:text-white transition-colors"
+              >
+                <DreamScrollLogo size={20} />
+                <span className="text-xs">Home</span>
+              </button>
+              
+              <button
+                onClick={() => setCurrentScreen('input')}
+                className="flex flex-col items-center space-y-1 text-white/60 hover:text-white transition-colors"
+              >
+                <Plus className="w-6 h-6" />
+                <span className="text-xs">Record</span>
+              </button>
+              
+              <button
+                onClick={() => setCurrentScreen('journal')}
+                className="flex flex-col items-center space-y-1 text-purple-400"
+              >
+                <Book className="w-6 h-6" />
+                <span className="text-xs">Journal</span>
+              </button>
+              
+              <button
+                onClick={() => setCurrentScreen('search')}
+                className="flex flex-col items-center space-y-1 text-white/60 hover:text-white transition-colors"
+              >
+                <Search className="w-6 h-6" />
+                <span className="text-xs">Search</span>
+              </button>
+              
+              <button
+                onClick={() => setCurrentScreen('profile')}
+                className="flex flex-col items-center space-y-1 text-white/60 hover:text-white transition-colors"
+              >
+                <User className="w-6 h-6" />
+                <span className="text-xs">Profile</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Search Screen
+  if (currentScreen === 'search') {
+    return (
+      <div className="max-w-sm mx-auto bg-gradient-to-br from-slate-900 to-purple-900 min-h-screen">
+        <OfflineIndicator />
+        <div className="min-h-screen text-white">
+          <div className="p-6 pb-24">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-8">
+              <button 
+                onClick={() => setCurrentScreen('home')}
+                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <h2 className="text-2xl font-bold">Search Dreams</h2>
+              <div className="w-10 h-10"></div>
+            </div>
+
+            {/* Search Input */}
+            <div className="relative mb-6">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search dreams, themes, or symbols..."
+                className="w-full p-4 pl-12 rounded-2xl bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:border-purple-400 focus:bg-white/15 transition-all backdrop-blur-sm"
+              />
+              <Search className="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-white/50" />
+            </div>
+
+            {/* Search Results */}
+            <div className="space-y-4">
+              {filteredDreams.map((dream) => (
+                <div
+                  key={dream.id}
+                  onClick={() => {
+                    setSelectedDream(dream);
+                    setCurrentScreen('interpretation');
+                  }}
+                  className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-xl cursor-pointer hover:bg-white/15 transition-all"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-lg font-bold">{dream.title}</h3>
+                    <span className="text-sm text-purple-300">{dream.date}</span>
+                  </div>
+                  
+                  <p className="text-white/80 mb-3 line-clamp-2">{dream.content}</p>
+                  
+                  <div className="flex flex-wrap gap-2">
+                    {dream.themes.slice(0, 3).map((theme, index) => (
+                      <span key={index} className="text-xs bg-purple-500/20 text-purple-200 px-2 py-1 rounded-full">
+                        {theme}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {searchQuery && filteredDreams.length === 0 && (
+              <div className="text-center py-12">
+                <Search className="w-16 h-16 text-white/30 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-white/70 mb-2">No results found</h3>
+                <p className="text-white/50">Try searching for different keywords or themes</p>
+              </div>
+            )}
+          </div>
+
+          {/* Bottom Navigation */}
+          <div className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-xl border-t border-white/10">
+            <div className="flex items-center justify-around py-3 px-6 max-w-sm mx-auto">
+              <button
+                onClick={() => setCurrentScreen('home')}
+                className="flex flex-col items-center space-y-1 text-white/60 hover:text-white transition-colors"
+              >
+                <DreamScrollLogo size={20} />
+                <span className="text-xs">Home</span>
+              </button>
+              
+              <button
+                onClick={() => setCurrentScreen('input')}
+                className="flex flex-col items-center space-y-1 text-white/60 hover:text-white transition-colors"
+              >
+                <Plus className="w-6 h-6" />
+                <span className="text-xs">Record</span>
+              </button>
+              
+              <button
+                onClick={() => setCurrentScreen('journal')}
+                className="flex flex-col items-center space-y-1 text-white/60 hover:text-white transition-colors"
+              >
+                <Book className="w-6 h-6" />
+                <span className="text-xs">Journal</span>
+              </button>
+              
+              <button
+                onClick={() => setCurrentScreen('search')}
+                className="flex flex-col items-center space-y-1 text-purple-400"
+              >
+                <Search className="w-6 h-6" />
+                <span className="text-xs">Search</span>
+              </button>
+              
+              <button
+                onClick={() => setCurrentScreen('profile')}
+                className="flex flex-col items-center space-y-1 text-white/60 hover:text-white transition-colors"
+              >
+                <User className="w-6 h-6" />
+                <span className="text-xs">Profile</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Profile Screen
+  if (currentScreen === 'profile') {
+    return (
+      <div className="max-w-sm mx-auto bg-gradient-to-br from-slate-900 to-purple-900 min-h-screen">
+        <OfflineIndicator />
+        <div className="min-h-screen text-white">
+          <div className="p-6 pb-24">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-8">
+              <button 
+                onClick={() => setCurrentScreen('home')}
+                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <h2 className="text-2xl font-bold">Profile</h2>
+              <button className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+                <Settings className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Profile Card */}
+            <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 mb-6 border border-white/20 shadow-xl text-center">
+              <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <User className="w-10 h-10" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">{isAuthenticated ? 'Dreamer' : 'Guest User'}</h3>
+              <p className="text-purple-300 mb-4">Spiritual Seeker</p>
+              <div className="flex justify-center space-x-4 text-sm">
+                <div className="text-center">
+                  <div className="text-lg font-bold text-green-400">{dreams.length}</div>
+                  <div className="text-white/70">Dreams</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-lg font-bold text-blue-400">{dreams.filter(d => d.isBookmarked).length}</div>
+                  <div className="text-white/70">Saved</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-lg font-bold text-purple-400">7</div>
+                  <div className="text-white/70">Day Streak</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Settings Options */}
+            <div className="space-y-3">
+              <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 border border-white/20">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <BookOpen className="w-5 h-5 text-blue-400" />
+                    <span>Export Dreams</span>
+                  </div>
+                  <button className="text-purple-400 hover:text-white transition-colors">
+                    →
+                  </button>
+                </div>
+              </div>
+
+              <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 border border-white/20">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <Download className="w-5 h-5 text-green-400" />
+                    <span>Backup & Sync</span>
+                  </div>
+                  <button className="text-purple-400 hover:text-white transition-colors">
+                    →
+                  </button>
+                </div>
+              </div>
+
+              <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 border border-white/20">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <Settings className="w-5 h-5 text-purple-400" />
+                    <span>App Settings</span>
+                  </div>
+                  <button className="text-purple-400 hover:text-white transition-colors">
+                    →
+                  </button>
+                </div>
+              </div>
+
+              {!isAuthenticated && (
+                <button
+                  onClick={() => setCurrentScreen('auth')}
+                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 py-4 rounded-2xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all"
+                >
+                  Sign In / Sign Up
+                </button>
+              )}
+
+              {isAuthenticated && (
+                <button
+                  onClick={() => {
+                    setIsAuthenticated(false);
+                    setCurrentScreen('home');
+                  }}
+                  className="w-full bg-red-500/20 border border-red-400/30 py-4 rounded-2xl font-semibold text-red-300 hover:bg-red-500/30 transition-all"
+                >
+                  Sign Out
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Bottom Navigation */}
+          <div className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-xl border-t border-white/10">
+            <div className="flex items-center justify-around py-3 px-6 max-w-sm mx-auto">
+              <button
+                onClick={() => setCurrentScreen('home')}
+                className="flex flex-col items-center space-y-1 text-white/60 hover:text-white transition-colors"
+              >
+                <DreamScrollLogo size={20} />
+                <span className="text-xs">Home</span>
+              </button>
+              
+              <button
+                onClick={() => setCurrentScreen('input')}
+                className="flex flex-col items-center space-y-1 text-white/60 hover:text-white transition-colors"
+              >
+                <Plus className="w-6 h-6" />
+                <span className="text-xs">Record</span>
+              </button>
+              
+              <button
+                onClick={() => setCurrentScreen('journal')}
+                className="flex flex-col items-center space-y-1 text-white/60 hover:text-white transition-colors"
+              >
+                <Book className="w-6 h-6" />
+                <span className="text-xs">Journal</span>
+              </button>
+              
+              <button
+                onClick={() => setCurrentScreen('search')}
+                className="flex flex-col items-center space-y-1 text-white/60 hover:text-white transition-colors"
+              >
+                <Search className="w-6 h-6" />
+                <span className="text-xs">Search</span>
+              </button>
+              
+              <button
+                onClick={() => setCurrentScreen('profile')}
+                className="flex flex-col items-center space-y-1 text-purple-400"
+              >
+                <User className="w-6 h-6" />
+                <span className="text-xs">Profile</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Default fallback (shouldn't reach here)
+  return (
+    <div className="max-w-sm mx-auto bg-black min-h-screen flex items-center justify-center text-white">
+      <div className="text-center">
+        <DreamScrollLogo size={64} className="mx-auto mb-4" />
+        <p>Loading DreamScroll...</p>
+      </div>
+    </div>
+  );
+}
