@@ -1,4 +1,136 @@
-'use client';
+// Home Screen
+  if (currentScreen === 'home') {
+    return (
+      <div className="max-w-sm mx-auto bg-black min-h-screen">
+        <PWAInstallBanner />
+        <OfflineIndicator />
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 to-purple-900 text-white">
+          <div className="p-6 pb-20">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-200 to-pink-200 bg-clip-text text-transparent">
+                  DreamScroll
+                </h1>
+                <div className="flex items-center space-x-2">
+                  <p className="text-purple-300">Good evening, Dreamer</p>
+                  <div className="flex items-center space-x-1">
+                    {isOnline ? <Wifi className="w-4 h-4 text-green-400" /> : <WifiOff className="w-4 h-4 text-orange-400" />}
+                    {isInstalled && <Download className="w-4 h-4 text-blue-400" title="Installed as PWA" />}
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => setCurrentScreen('profile')}
+                className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center"
+              >
+                <User className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6 mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold">Quick Record</h2>
+                <div className="flex items-center space-x-2">
+                  <Moon className="w-6 h-6 text-purple-300" />
+                  {audioSupported && <Mic className="w-5 h-5 text-green-400" />}
+                  {!isOnline && <span className="text-xs bg-orange-500/20 text-orange-300 px-2 py-1 rounded">Offline</span>}
+                </div>
+              </div>
+              <p className="text-white/70 mb-4">
+                Record with voice or type your dream
+              </p>
+              <button
+                onClick={() => setCurrentScreen('input')}
+                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 py-4 rounded-2xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all transform hover:scale-105"
+              >
+                🎤 Start Recording
+              </button>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6 mb-8">
+              <h3 className="text-lg font-semibold mb-4 flex items-center">
+                <Sparkles className="w-5 h-5 mr-2 text-yellow-300" />
+                Recent Dreams
+              </h3>
+              
+              <div className="space-y-3">
+                {dreams.slice(0, 2).map((dream) => (
+                  <div
+                    key={dream.id}
+                    onClick={() => {
+                      setSelectedDream(dream);
+                      setCurrentScreen('dreamDetail');
+                    }}
+                    className="bg-white/5 rounded-2xl p-4 cursor-pointer hover:bg-white/10 transition-all"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-medium">{dream.title}</h4>
+                      <span className="text-xs text-purple-300">{dream.date}</span>
+                    </div>
+                    <p className="text-sm text-white/70">{dream.content.substring(0, 80)}...</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {installPrompt && !isInstalled && (
+              <div className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 backdrop-blur-lg rounded-3xl p-6 mb-8 border border-purple-500/30">
+                <h3 className="text-lg font-semibold mb-2 flex items-center">
+                  <Download className="w-5 h-5 mr-2 text-purple-300" />
+                  Install DreamScroll
+                </h3>
+                <p className="text-white/70 mb-4 text-sm">
+                  Add DreamScroll to your home screen for faster access and offline functionality.
+                </p>
+                <button
+                  onClick={handleInstallPWA}
+                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 py-3 rounded-2xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all"
+                >
+                  📱 Install as App
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-lg border-t border-white/10">
+            <div className="flex items-center justify-around py-3 px-6 max-w-sm mx-auto">
+              <button
+                onClick={() => setCurrentScreen('home')}
+                className="flex flex-col items-center space-y-1 text-purple-400"
+              >
+                <Moon className="w-6 h-6" />
+                <span className="text-xs">Home</span>
+              </button>
+              
+              <button
+                onClick={() => setCurrentScreen('input')}
+                className="flex flex-col items-center space-y-1 text-white/60"
+              >
+                <Plus className="w-6 h-6" />
+                <span className="text-xs">Record</span>
+              </button>
+              
+              <button
+                onClick={() => setCurrentScreen('journal')}
+                className="flex flex-col items-center space-y-1 text-white/60"
+              >
+                <Book className="w-6 h-6" />
+                <span className="text-xs">Journal</span>
+              </button>
+              
+              <button
+                onClick={() => setCurrentScreen('profile')}
+                className="flex flex-col items-center space-y-1 text-white/60"
+              >
+                <User className="w-6 h-6" />
+                <span className="text-xs">Profile</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
 import { 
@@ -31,6 +163,9 @@ export default function DreamScrollPWA() {
   const [isListening, setIsListening] = useState(false);
   const [speechRecognition, setSpeechRecognition] = useState<any>(null);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [installPrompt, setInstallPrompt] = useState<any>(null);
+  const [isInstalled, setIsInstalled] = useState(false);
+  const [swRegistration, setSwRegistration] = useState<ServiceWorkerRegistration | null>(null);
   const recordingIntervalRef = useRef<any>(null);
   
   const [dreams, setDreams] = useState<Dream[]>([
@@ -63,6 +198,65 @@ export default function DreamScrollPWA() {
       
       window.addEventListener('online', handleOnline);
       window.addEventListener('offline', handleOffline);
+      
+      // PWA install prompt handling
+      const handleBeforeInstallPrompt = (e: Event) => {
+        console.log('💾 PWA install prompt available');
+        e.preventDefault();
+        setInstallPrompt(e);
+      };
+      
+      window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      
+      // Check if already installed
+      const checkIfInstalled = () => {
+        if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
+          console.log('📱 Running as installed PWA');
+          setIsInstalled(true);
+        } else if ((window.navigator as any).standalone === true) {
+          console.log('🍎 Running as iOS PWA');
+          setIsInstalled(true);
+        }
+      };
+      
+      checkIfInstalled();
+      
+      // Register service worker
+      const registerServiceWorker = async () => {
+        if ('serviceWorker' in navigator) {
+          try {
+            console.log('🔧 Registering service worker...');
+            const registration = await navigator.serviceWorker.register('/sw.js');
+            
+            setSwRegistration(registration);
+            console.log('✅ Service Worker registered successfully');
+            
+            // Handle updates
+            registration.addEventListener('updatefound', () => {
+              console.log('🔄 Service Worker update found');
+              const newWorker = registration.installing;
+              
+              if (newWorker) {
+                newWorker.addEventListener('statechange', () => {
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    console.log('🆕 New Service Worker installed, prompting to reload');
+                    if (confirm('A new version of DreamScroll is available. Reload to update?')) {
+                      window.location.reload();
+                    }
+                  }
+                });
+              }
+            });
+            
+          } catch (error) {
+            console.error('❌ Service Worker registration failed:', error);
+          }
+        } else {
+          console.log('❌ Service Workers not supported');
+        }
+      };
+      
+      registerServiceWorker();
       
       // Enhanced audio support detection
       const checkAudioSupport = async () => {
@@ -113,6 +307,7 @@ export default function DreamScrollPWA() {
       return () => {
         window.removeEventListener('online', handleOnline);
         window.removeEventListener('offline', handleOffline);
+        window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       };
     }
   }, []);
@@ -127,14 +322,69 @@ export default function DreamScrollPWA() {
     // TEST button removed - only real recording now
   };
 
-  const processAudioToText = () => {
-    setIsProcessing(true);
+  // PWA Install Handler
+  const handleInstallPWA = async () => {
+    if (installPrompt) {
+      console.log('📱 Triggering PWA install prompt');
+      (installPrompt as any).prompt();
+      const result = await (installPrompt as any).userChoice;
+      
+      if (result.outcome === 'accepted') {
+        console.log('✅ User accepted PWA install');
+        setInstallPrompt(null);
+        setIsInstalled(true);
+      } else {
+        console.log('❌ User declined PWA install');
+      }
+    }
+  };
+
+  // PWA Install Banner Component
+  const PWAInstallBanner = () => {
+    if (!installPrompt || isInstalled) return null;
     
-    setTimeout(() => {
-      const mockText = "I had a vivid dream where I was walking through a beautiful garden filled with colorful flowers.";
-      setDreamText(mockText);
-      setIsProcessing(false);
-    }, 2000);
+    return (
+      <div className="fixed top-4 left-4 right-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl p-4 z-50 mx-auto max-w-sm shadow-lg">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <Download className="w-6 h-6 text-white" />
+            <div>
+              <p className="font-semibold text-white">Install DreamScroll</p>
+              <p className="text-xs text-white/80">Add to home screen for better experience</p>
+            </div>
+          </div>
+          <div className="flex space-x-2">
+            <button 
+              onClick={() => setInstallPrompt(null)}
+              className="text-white/60 hover:text-white transition-colors"
+              title="Dismiss"
+            >
+              ✕
+            </button>
+            <button 
+              onClick={handleInstallPWA}
+              className="bg-white/20 px-3 py-1 rounded-lg text-white text-sm font-semibold hover:bg-white/30 transition-colors"
+            >
+              Install
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Offline Indicator Component
+  const OfflineIndicator = () => {
+    if (isOnline) return null;
+    
+    return (
+      <div className="fixed top-4 left-4 right-4 bg-orange-600 rounded-xl p-3 z-40 mx-auto max-w-sm shadow-lg">
+        <div className="flex items-center justify-center space-x-2">
+          <WifiOff className="w-5 h-5 text-white" />
+          <span className="text-white font-semibold text-sm">You're offline - some features may be limited</span>
+        </div>
+      </div>
+    );
   };
 
   const startRealRecording = async () => {
@@ -430,6 +680,8 @@ export default function DreamScrollPWA() {
   if (currentScreen === 'onboarding') {
     return (
       <div className="max-w-sm mx-auto bg-black min-h-screen">
+        <PWAInstallBanner />
+        <OfflineIndicator />
         <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex flex-col items-center justify-center p-6 text-white">
           <div className="text-center space-y-8 max-w-md">
             <div className="relative">
@@ -446,6 +698,42 @@ export default function DreamScrollPWA() {
               <p className="text-xl text-purple-200 mb-4">
                 AI-powered biblical dream interpretation
               </p>
+              <div className="flex items-center justify-center space-x-2 text-sm text-purple-300">
+                <Wifi className="w-4 h-4" />
+                <span>Works offline • Voice recording • Installable PWA</span>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center space-x-3 text-left">
+                <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
+                  <Mic className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">Voice Recording</h3>
+                  <p className="text-sm text-purple-200">Record dreams with your voice</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-3 text-left">
+                <div className="w-10 h-10 bg-pink-600 rounded-full flex items-center justify-center">
+                  <Brain className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">AI Interpretation</h3>
+                  <p className="text-sm text-purple-200">Biblical insights powered by AI</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-3 text-left">
+                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                  <Download className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">Works Offline</h3>
+                  <p className="text-sm text-purple-200">Install as app on your device</p>
+                </div>
+              </div>
             </div>
 
             <button
@@ -454,6 +742,15 @@ export default function DreamScrollPWA() {
             >
               Begin Your Journey
             </button>
+            
+            {installPrompt && !isInstalled && (
+              <button
+                onClick={handleInstallPWA}
+                className="w-full bg-white/10 border border-white/20 py-3 rounded-2xl font-semibold hover:bg-white/20 transition-all"
+              >
+                📱 Install as App
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -574,6 +871,7 @@ export default function DreamScrollPWA() {
   if (currentScreen === 'input') {
     return (
       <div className="max-w-sm mx-auto bg-black min-h-screen">
+        <OfflineIndicator />
         <div className="min-h-screen bg-gradient-to-br from-slate-900 to-indigo-900 text-white">
           <div className="p-6">
             <div className="flex items-center justify-between mb-8">
@@ -880,8 +1178,53 @@ export default function DreamScrollPWA() {
                       <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all ${audioSupported ? 'right-0.5' : 'left-0.5'}`}></div>
                     </div>
                   </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <Download className="w-5 h-5 text-blue-400" />
+                      <span>PWA Installed</span>
+                    </div>
+                    <div className={`w-12 h-6 rounded-full ${isInstalled ? 'bg-green-500' : 'bg-gray-500'} relative`}>
+                      <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all ${isInstalled ? 'right-0.5' : 'left-0.5'}`}></div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <Wifi className="w-5 h-5 text-green-400" />
+                      <span>Online Status</span>
+                    </div>
+                    <div className={`w-12 h-6 rounded-full ${isOnline ? 'bg-green-500' : 'bg-orange-500'} relative`}>
+                      <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all ${isOnline ? 'right-0.5' : 'left-0.5'}`}></div>
+                    </div>
+                  </div>
+                  
+                  {swRegistration && (
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <Brain className="w-5 h-5 text-purple-400" />
+                        <span>Service Worker</span>
+                      </div>
+                      <div className="w-12 h-6 rounded-full bg-green-500 relative">
+                        <div className="w-5 h-5 bg-white rounded-full absolute top-0.5 right-0.5"></div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
+
+              {!isInstalled && installPrompt && (
+                <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-3xl p-6">
+                  <h3 className="text-lg font-semibold mb-2">Install DreamScroll</h3>
+                  <p className="text-white/80 mb-4">Add to your home screen for the best experience</p>
+                  <button
+                    onClick={handleInstallPWA}
+                    className="w-full bg-white/20 py-3 rounded-2xl font-semibold hover:bg-white/30 transition-colors"
+                  >
+                    📱 Install Now
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
