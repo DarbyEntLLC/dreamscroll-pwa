@@ -24,7 +24,7 @@ interface Dream {
 
 type ScreenType = 'onboarding' | 'home' | 'input' | 'journal' | 'dreamDetail' | 'interpretation' | 'trends' | 'profile';
 
-const DreamScrollPWA: React.FC = () => {
+const DreamScrollPWA = () => {
   const [currentScreen, setCurrentScreen] = useState<ScreenType>('onboarding');
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [recordingTimer, setRecordingTimer] = useState<number>(0);
