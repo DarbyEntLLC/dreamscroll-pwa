@@ -367,7 +367,12 @@ export default function DreamScrollPWA() {
                       placeholder="Type your dream here or use voice recording above..."
                       disabled={isRecording}
                       rows={4}
-                      className="w-full p-4 bg-gray-800 border border-gray-600 rounded-2xl text-white placeholder-gray-400 resize-none focus:outline-none focus:border-purple-400 transition-all"
+                      style={{
+                        backgroundColor: '#1f2937',
+                        color: '#ffffff',
+                        border: '1px solid #4b5563'
+                      }}
+                      className="w-full p-4 rounded-2xl placeholder-gray-400 resize-none focus:outline-none focus:border-purple-400 transition-all"
                     />
                     {dreamText.trim() && !isProcessing && !isRecording && (
                       <button
