@@ -28,7 +28,6 @@ export default function DreamScrollPWA() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
   const [audioSupported, setAudioSupported] = useState(false);
-  
   const [dreams, setDreams] = useState([
     {
       id: 1,
