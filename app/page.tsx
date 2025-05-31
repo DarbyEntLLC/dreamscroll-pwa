@@ -28,6 +28,10 @@ export default function DreamScrollPWA() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
   const [audioSupported, setAudioSupported] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
+  const recordingIntervalRef = useRef<any>(null);
+  
   const [dreams, setDreams] = useState<Dream[]>([
     {
       id: 1,
@@ -53,7 +57,6 @@ export default function DreamScrollPWA() {
     }
   ]);
   const [selectedDream, setSelectedDream] = useState<Dream | null>(null);
-  const recordingIntervalRef = useRef(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -116,7 +119,6 @@ export default function DreamScrollPWA() {
       setDreamText(randomText);
       setIsProcessing(false);
     }, 2000);
-    }
   };
 
   const startRealRecording = async () => {
@@ -128,7 +130,6 @@ export default function DreamScrollPWA() {
     }
 
     try {
-      // Request microphone permission
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
           echoCancellation: true,
@@ -140,7 +141,6 @@ export default function DreamScrollPWA() {
       
       console.log('Microphone access granted');
       
-      // Create MediaRecorder
       const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
       const recorder = new MediaRecorder(stream, { mimeType });
       const chunks: Blob[] = [];
@@ -156,13 +156,11 @@ export default function DreamScrollPWA() {
         console.log('Recording stopped, processing audio...');
         const audioBlob = new Blob(chunks, { type: mimeType });
         
-        // Stop all tracks to release microphone
         stream.getTracks().forEach(track => {
           track.stop();
           console.log('Audio track stopped');
         });
         
-        // Process the audio
         await processRealAudioToText(audioBlob);
       };
       
@@ -172,13 +170,11 @@ export default function DreamScrollPWA() {
         setIsRecording(false);
       };
       
-      // Start recording
-      recorder.start(1000); // Collect data every second
+      recorder.start(1000);
       setMediaRecorder(recorder);
       setIsRecording(true);
       setRecordingTimer(0);
       
-      // Start timer
       recordingIntervalRef.current = setInterval(() => {
         setRecordingTimer(prev => prev + 1);
       }, 1000) as any;
@@ -213,7 +209,6 @@ export default function DreamScrollPWA() {
       console.log('MediaRecorder stop called');
     }
     
-    // Clear timer
     if (recordingIntervalRef.current) {
       clearInterval(recordingIntervalRef.current);
       recordingIntervalRef.current = null;
@@ -228,21 +223,18 @@ export default function DreamScrollPWA() {
     setIsProcessing(true);
     
     try {
-      // Option 1: Use Web Speech API (works in Chrome/Edge)
       if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         console.log('Using Web Speech API...');
         await processWithWebSpeechAPI();
         return;
       }
       
-      // Option 2: Use OpenAI Whisper API (requires API key)
-      if (audioBlob.size > 1000) { // Only process if we have actual audio
+      if (audioBlob.size > 1000) {
         console.log('Using OpenAI Whisper API...');
         await processWithWhisperAPI(audioBlob);
         return;
       }
       
-      // Fallback: Use mock data
       console.log('Using fallback mock transcription...');
       setTimeout(() => {
         const mockTexts = [
@@ -314,7 +306,6 @@ export default function DreamScrollPWA() {
       console.log('Starting Web Speech API...');
       recognition.start();
       
-      // Stop after 10 seconds if still running
       setTimeout(() => {
         if (recognition) {
           recognition.stop();
@@ -324,13 +315,9 @@ export default function DreamScrollPWA() {
   };
 
   const processWithWhisperAPI = async (audioBlob: Blob) => {
-    // Note: This requires an OpenAI API key and backend endpoint
-    // For now, we'll use a placeholder that could be implemented later
-    
     console.log('Whisper API integration would go here');
     console.log('Audio blob size:', audioBlob.size);
     
-    // Simulate API call
     setTimeout(() => {
       const mockTranscription = "I had a vivid dream where I was in a beautiful temple with golden pillars and peaceful music playing softly in the background.";
       console.log('Mock Whisper transcription:', mockTranscription);
@@ -362,7 +349,7 @@ export default function DreamScrollPWA() {
       
       const randomInterpretation = interpretations[Math.floor(Math.random() * interpretations.length)];
       
-      const newDream = {
+      const newDream: Dream = {
         id: dreams.length + 1,
         title: dreamContent.substring(0, 30) + (dreamContent.length > 30 ? "..." : ""),
         date: new Date().toISOString().split('T')[0],
@@ -392,6 +379,151 @@ export default function DreamScrollPWA() {
               <div className="w-32 h-32 mx-auto bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
                 <Moon className="w-16 h-16 text-white" />
               </div>
+    );
+  }
+
+  if (currentScreen === 'journal') {
+    return (
+      <div className="max-w-sm mx-auto bg-black min-h-screen">
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 to-purple-900 text-white">
+          <div className="p-6 pb-20">
+            <div className="flex items-center justify-between mb-8">
+              <button onClick={() => setCurrentScreen('home')}>
+                <ArrowLeft className="w-6 h-6" />
+              </button>
+              <h2 className="text-2xl font-bold">Dream Journal</h2>
+              <div className="w-6 h-6"></div>
+            </div>
+
+            <div className="space-y-4">
+              {dreams.map((dream) => (
+                <div
+                  key={dream.id}
+                  onClick={() => {
+                    setSelectedDream(dream);
+                    setCurrentScreen('dreamDetail');
+                  }}
+                  className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 cursor-pointer hover:bg-white/15 transition-all"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-semibold text-lg">{dream.title}</h3>
+                    <span className="text-xs text-purple-300">{dream.date}</span>
+                  </div>
+                  
+                  <p className="text-white/70 mb-4">{dream.content.substring(0, 120)}...</p>
+                  
+                  <div className="bg-purple-500/20 text-purple-200 px-2 py-1 rounded-lg text-xs inline-block">
+                    {dream.mood}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (currentScreen === 'dreamDetail') {
+    if (!selectedDream) return null;
+    
+    return (
+      <div className="max-w-sm mx-auto bg-black min-h-screen">
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 to-purple-900 text-white">
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-8">
+              <button onClick={() => setCurrentScreen('journal')}>
+                <ArrowLeft className="w-6 h-6" />
+              </button>
+              <h2 className="text-xl font-bold">Dream Details</h2>
+              <button
+                onClick={() => setCurrentScreen('interpretation')}
+                className="p-2 bg-white/10 rounded-full"
+              >
+                <Brain className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6">
+                <h3 className="text-2xl font-bold mb-4">{selectedDream.title}</h3>
+                <div className="flex items-center space-x-4 mb-4">
+                  <span className="text-purple-300">{selectedDream.date}</span>
+                  <div className="bg-green-500/20 text-green-300 px-3 py-1 rounded-full text-sm">
+                    {selectedDream.mood}
+                  </div>
+                </div>
+                <p className="text-white/90 leading-relaxed">{selectedDream.content}</p>
+              </div>
+
+              <button
+                onClick={() => setCurrentScreen('interpretation')}
+                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 py-3 rounded-2xl font-semibold"
+              >
+                View Full Interpretation
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (currentScreen === 'profile') {
+    return (
+      <div className="max-w-sm mx-auto bg-black min-h-screen">
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 to-purple-900 text-white">
+          <div className="p-6 pb-20">
+            <div className="flex items-center justify-between mb-8">
+              <button onClick={() => setCurrentScreen('home')}>
+                <ArrowLeft className="w-6 h-6" />
+              </button>
+              <h2 className="text-2xl font-bold">Profile</h2>
+              <div className="w-6 h-6"></div>
+            </div>
+
+            <div className="space-y-6">
+              <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6 text-center">
+                <div className="w-20 h-20 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <User className="w-10 h-10 text-white" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">Dream Explorer</h3>
+                <p className="text-purple-300">Member since May 2025</p>
+                <div className="flex justify-center space-x-4 mt-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-300">{dreams.length}</div>
+                    <div className="text-xs text-white/70">Dreams</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-300">7</div>
+                    <div className="text-xs text-white/70">Day Streak</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6">
+                <h3 className="text-lg font-semibold mb-4">App Features</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <Mic className="w-5 h-5 text-green-400" />
+                      <span>Voice Recording</span>
+                    </div>
+                    <div className={`w-12 h-6 rounded-full ${audioSupported ? 'bg-green-500' : 'bg-gray-500'} relative`}>
+                      <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all ${audioSupported ? 'right-0.5' : 'left-0.5'}`}></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+}
               <Sparkles className="w-8 h-8 absolute top-4 right-8 text-yellow-300 animate-pulse" />
             </div>
             
@@ -698,148 +830,3 @@ export default function DreamScrollPWA() {
           </div>
         </div>
       </div>
-    );
-  }
-
-  if (currentScreen === 'journal') {
-    return (
-      <div className="max-w-sm mx-auto bg-black min-h-screen">
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 to-purple-900 text-white">
-          <div className="p-6 pb-20">
-            <div className="flex items-center justify-between mb-8">
-              <button onClick={() => setCurrentScreen('home')}>
-                <ArrowLeft className="w-6 h-6" />
-              </button>
-              <h2 className="text-2xl font-bold">Dream Journal</h2>
-              <div className="w-6 h-6"></div>
-            </div>
-
-            <div className="space-y-4">
-              {dreams.map((dream) => (
-                <div
-                  key={dream.id}
-                  onClick={() => {
-                    setSelectedDream(dream);
-                    setCurrentScreen('dreamDetail');
-                  }}
-                  className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 cursor-pointer hover:bg-white/15 transition-all"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-semibold text-lg">{dream.title}</h3>
-                    <span className="text-xs text-purple-300">{dream.date}</span>
-                  </div>
-                  
-                  <p className="text-white/70 mb-4">{dream.content.substring(0, 120)}...</p>
-                  
-                  <div className="bg-purple-500/20 text-purple-200 px-2 py-1 rounded-lg text-xs inline-block">
-                    {dream.mood}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (currentScreen === 'dreamDetail') {
-    if (!selectedDream) return null;
-    
-    return (
-      <div className="max-w-sm mx-auto bg-black min-h-screen">
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 to-purple-900 text-white">
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-8">
-              <button onClick={() => setCurrentScreen('journal')}>
-                <ArrowLeft className="w-6 h-6" />
-              </button>
-              <h2 className="text-xl font-bold">Dream Details</h2>
-              <button
-                onClick={() => setCurrentScreen('interpretation')}
-                className="p-2 bg-white/10 rounded-full"
-              >
-                <Brain className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="space-y-6">
-              <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6">
-                <h3 className="text-2xl font-bold mb-4">{selectedDream.title}</h3>
-                <div className="flex items-center space-x-4 mb-4">
-                  <span className="text-purple-300">{selectedDream.date}</span>
-                  <div className="bg-green-500/20 text-green-300 px-3 py-1 rounded-full text-sm">
-                    {selectedDream.mood}
-                  </div>
-                </div>
-                <p className="text-white/90 leading-relaxed">{selectedDream.content}</p>
-              </div>
-
-              <button
-                onClick={() => setCurrentScreen('interpretation')}
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 py-3 rounded-2xl font-semibold"
-              >
-                View Full Interpretation
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (currentScreen === 'profile') {
-    return (
-      <div className="max-w-sm mx-auto bg-black min-h-screen">
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 to-purple-900 text-white">
-          <div className="p-6 pb-20">
-            <div className="flex items-center justify-between mb-8">
-              <button onClick={() => setCurrentScreen('home')}>
-                <ArrowLeft className="w-6 h-6" />
-              </button>
-              <h2 className="text-2xl font-bold">Profile</h2>
-              <div className="w-6 h-6"></div>
-            </div>
-
-            <div className="space-y-6">
-              <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6 text-center">
-                <div className="w-20 h-20 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <User className="w-10 h-10 text-white" />
-                </div>
-                <h3 className="text-xl font-bold mb-2">Dream Explorer</h3>
-                <p className="text-purple-300">Member since May 2025</p>
-                <div className="flex justify-center space-x-4 mt-4">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-300">{dreams.length}</div>
-                    <div className="text-xs text-white/70">Dreams</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-300">7</div>
-                    <div className="text-xs text-white/70">Day Streak</div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6">
-                <h3 className="text-lg font-semibold mb-4">App Features</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <Mic className="w-5 h-5 text-green-400" />
-                      <span>Voice Recording</span>
-                    </div>
-                    <div className={`w-12 h-6 rounded-full ${audioSupported ? 'bg-green-500' : 'bg-gray-500'} relative`}>
-                      <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all ${audioSupported ? 'right-0.5' : 'left-0.5'}`}></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return null;
-}
