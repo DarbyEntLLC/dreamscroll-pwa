@@ -622,7 +622,7 @@ export default function DreamScrollPWA() {
                   <p className="text-purple-300">Good evening, Dreamer</p>
                   <div className="flex items-center space-x-1">
                     {isOnline ? <Wifi className="w-4 h-4 text-green-400" /> : <WifiOff className="w-4 h-4 text-orange-400" />}
-                    {isInstalled && <Download className="w-4 h-4 text-blue-400" title="Installed as PWA" />}
+                    {isInstalled && <Download className="w-4 h-4 text-blue-400" />}
                   </div>
                 </div>
               </div>
