@@ -6,6 +6,77 @@ import {
   Moon, Sparkles, Brain, Wifi, WifiOff, Download
 } from 'lucide-react';
 
+// DreamScroll Logo Component
+const DreamScrollLogo: React.FC<{ size?: number; className?: string }> = ({ size = 32, className = "" }) => {
+  return (
+    <div className={`flex items-center justify-center ${className}`} style={{ width: size, height: size }}>
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 100 100"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          <radialGradient id="bgGradient" cx="50%" cy="30%" r="70%">
+            <stop offset="0%" stopColor="#8b5cf6" />
+            <stop offset="100%" stopColor="#3730a3" />
+          </radialGradient>
+          <linearGradient id="moonGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#fbbf24" />
+            <stop offset="100%" stopColor="#f59e0b" />
+          </linearGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge> 
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+        
+        <circle cx="50" cy="50" r="48" fill="url(#bgGradient)" opacity="0.9" />
+        
+        <circle cx="25" cy="25" r="1.5" fill="#fbbf24" opacity="0.8">
+          <animate attributeName="opacity" values="0.4;1;0.4" dur="2s" repeatCount="indefinite" />
+        </circle>
+        <circle cx="75" cy="30" r="1" fill="#fbbf24" opacity="0.6">
+          <animate attributeName="opacity" values="0.3;0.9;0.3" dur="3s" repeatCount="indefinite" />
+        </circle>
+        <circle cx="80" cy="70" r="1.2" fill="#fbbf24" opacity="0.7">
+          <animate attributeName="opacity" values="0.5;1;0.5" dur="2.5s" repeatCount="indefinite" />
+        </circle>
+        
+        <path
+          d="M35 20 C35 20, 25 30, 25 50 C25 70, 35 80, 45 80 C40 80, 35 75, 35 50 C35 25, 40 20, 45 20 Z"
+          fill="url(#moonGradient)"
+          filter="url(#glow)"
+        />
+        
+        <rect x="55" y="35" width="25" height="30" rx="2" fill="#f3f4f6" stroke="#d1d5db" strokeWidth="1" />
+        <rect x="55" y="35" width="25" height="4" rx="2" fill="#e5e7eb" />
+        
+        <line x1="58" y1="45" x2="75" y2="45" stroke="#6b7280" strokeWidth="1" opacity="0.7" />
+        <line x1="58" y1="50" x2="77" y2="50" stroke="#6b7280" strokeWidth="1" opacity="0.7" />
+        <line x1="58" y1="55" x2="72" y2="55" stroke="#6b7280" strokeWidth="1" opacity="0.7" />
+        <line x1="58" y1="60" x2="76" y2="60" stroke="#6b7280" strokeWidth="1" opacity="0.7" />
+        
+        <g opacity="0.6">
+          <path d="M70 25 L71 27 L73 26 L71 28 L70 25 Z" fill="#fbbf24">
+            <animateTransform
+              attributeName="transform"
+              type="rotate"
+              values="0 71 26;360 71 26"
+              dur="4s"
+              repeatCount="indefinite"
+            />
+          </path>
+        </g>
+      </svg>
+    </div>
+  );
+};
+
 interface Dream {
   id: number;
   title: string;
@@ -534,7 +605,7 @@ export default function DreamScrollPWA() {
           <div className="text-center space-y-8 max-w-md">
             <div className="relative">
               <div className="w-32 h-32 mx-auto bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
-                <Moon className="w-16 h-16 text-white" />
+                <DreamScrollLogo size={64} />
               </div>
               <Sparkles className="w-8 h-8 absolute top-4 right-8 text-yellow-300 animate-pulse" />
             </div>
@@ -638,7 +709,7 @@ export default function DreamScrollPWA() {
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold">Quick Record</h2>
                 <div className="flex items-center space-x-2">
-                  <Moon className="w-6 h-6 text-purple-300" />
+                  <DreamScrollLogo size={24} />
                   {audioSupported && <Mic className="w-5 h-5 text-green-400" />}
                   {!isOnline && <span className="text-xs bg-orange-500/20 text-orange-300 px-2 py-1 rounded">Offline</span>}
                 </div>
@@ -705,7 +776,7 @@ export default function DreamScrollPWA() {
                 onClick={() => setCurrentScreen('home')}
                 className="flex flex-col items-center space-y-1 text-purple-400"
               >
-                <Moon className="w-6 h-6" />
+                <DreamScrollLogo size={24} />
                 <span className="text-xs">Home</span>
               </button>
               
@@ -757,7 +828,7 @@ export default function DreamScrollPWA() {
             <div className="space-y-6">
               <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6">
                 <h3 className="text-lg font-semibold mb-4 flex items-center">
-                  <Moon className="w-5 h-5 mr-2 text-purple-300" />
+                  <DreamScrollLogo size={20} className="mr-2" />
                   Describe Your Dream
                 </h3>
                 
@@ -1022,7 +1093,7 @@ export default function DreamScrollPWA() {
             <div className="space-y-6">
               <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6 text-center">
                 <div className="w-20 h-20 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <User className="w-10 h-10 text-white" />
+                  <DreamScrollLogo size={40} />
                 </div>
                 <h3 className="text-xl font-bold mb-2">Dream Explorer</h3>
                 <p className="text-purple-300">Member since May 2025</p>
