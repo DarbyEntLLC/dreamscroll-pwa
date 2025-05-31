@@ -268,7 +268,7 @@ export default function DreamScrollPWA() {
             <div className="flex items-center justify-around py-3 px-6 max-w-sm mx-auto">
               <button
                 onClick={() => setCurrentScreen('home')}
-                className={`flex flex-col items-center space-y-1 ${currentScreen === 'home' ? 'text-purple-400' : 'text-white/60'}`}
+                className="flex flex-col items-center space-y-1 text-purple-400"
               >
                 <Moon className="w-6 h-6" />
                 <span className="text-xs">Home</span>
@@ -276,7 +276,7 @@ export default function DreamScrollPWA() {
               
               <button
                 onClick={() => setCurrentScreen('input')}
-                className={`flex flex-col items-center space-y-1 ${currentScreen === 'input' ? 'text-purple-400' : 'text-white/60'}`}
+                className="flex flex-col items-center space-y-1 text-white/60"
               >
                 <Plus className="w-6 h-6" />
                 <span className="text-xs">Record</span>
@@ -284,7 +284,7 @@ export default function DreamScrollPWA() {
               
               <button
                 onClick={() => setCurrentScreen('journal')}
-                className={`flex flex-col items-center space-y-1 ${currentScreen === 'journal' ? 'text-purple-400' : 'text-white/60'}`}
+                className="flex flex-col items-center space-y-1 text-white/60"
               >
                 <Book className="w-6 h-6" />
                 <span className="text-xs">Journal</span>
@@ -292,7 +292,7 @@ export default function DreamScrollPWA() {
               
               <button
                 onClick={() => setCurrentScreen('profile')}
-                className={`flex flex-col items-center space-y-1 ${currentScreen === 'profile' ? 'text-purple-400' : 'text-white/60'}`}
+                className="flex flex-col items-center space-y-1 text-white/60"
               >
                 <User className="w-6 h-6" />
                 <span className="text-xs">Profile</span>
