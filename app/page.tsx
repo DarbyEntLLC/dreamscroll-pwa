@@ -49,9 +49,79 @@ export default function DreamScrollPWA() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      if (navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function') {
-        setAudioSupported(true);
-      }
+      // Check for online/offline status
+      const handleOnline = () => {
+        console.log('🌐 Online');
+        setIsOnline(true);
+      };
+      const handleOffline = () => {
+        console.log('📴 Offline');
+        setIsOnline(false);
+      };
+      
+      window.addEventListener('online', handleOnline);
+      window.addEventListener('offline', handleOffline);
+      
+      // Enhanced audio support detection
+      const checkAudioSupport = async () => {
+        console.log('🔍 Checking audio support...');
+        
+        try {
+          // Check if MediaDevices API is available
+          if (!navigator.mediaDevices) {
+            console.log('❌ MediaDevices API not available');
+            setAudioSupported(false);
+            return;
+          }
+          
+          // Check if getUserMedia is available
+          if (typeof navigator.mediaDevices.getUserMedia !== 'function') {
+            console.log('❌ getUserMedia not available');
+            setAudioSupported(false);
+            return;
+          }
+          
+          // Check if MediaRecorder is available
+          if (typeof MediaRecorder === 'undefined') {
+            console.log('❌ MediaRecorder not available');
+            setAudioSupported(false);
+            return;
+          }
+          
+          // Check if any audio MIME types are supported
+          const audioMimeTypes = [
+            'audio/webm;codecs=opus',
+            'audio/webm',
+            'audio/mp4',
+            'audio/ogg;codecs=opus'
+          ];
+          
+          const supportedMimeType = audioMimeTypes.find(mimeType => 
+            MediaRecorder.isTypeSupported(mimeType)
+          );
+          
+          if (!supportedMimeType) {
+            console.log('❌ No supported audio MIME types');
+            setAudioSupported(false);
+            return;
+          }
+          
+          console.log('✅ Audio support detected');
+          console.log('📼 Supported MIME type:', supportedMimeType);
+          setAudioSupported(true);
+          
+        } catch (error) {
+          console.error('❌ Error checking audio support:', error);
+          setAudioSupported(false);
+        }
+      };
+      
+      checkAudioSupport();
+
+      return () => {
+        window.removeEventListener('online', handleOnline);
+        window.removeEventListener('offline', handleOffline);
+      };
     }
   }, []);
 
@@ -94,44 +164,150 @@ export default function DreamScrollPWA() {
   };
 
   const startRealRecording = async () => {
+    console.log('🎤 Starting real microphone recording...');
+    
     if (!audioSupported) {
-      alert('Audio recording not supported. Please use the TEST button.');
+      console.log('❌ Audio not supported');
+      alert('Audio recording not supported in this browser. Please use Chrome, Firefox, or Safari, or try the TEST button.');
       return;
     }
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
+      console.log('🔍 Requesting microphone access...');
       
-      recorder.ondataavailable = () => {
-        console.log('Audio data received');
+      // Request microphone permission with specific constraints
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          sampleRate: 44100
+        } 
+      });
+      
+      console.log('✅ Microphone access granted');
+      
+      // Check MediaRecorder support
+      const mimeTypes = [
+        'audio/webm;codecs=opus',
+        'audio/webm',
+        'audio/mp4',
+        'audio/ogg;codecs=opus'
+      ];
+      
+      let selectedMimeType = '';
+      for (const mimeType of mimeTypes) {
+        if (MediaRecorder.isTypeSupported(mimeType)) {
+          selectedMimeType = mimeType;
+          console.log('📼 Using MIME type:', mimeType);
+          break;
+        }
+      }
+      
+      if (!selectedMimeType) {
+        throw new Error('No supported audio format found');
+      }
+      
+      // Create MediaRecorder
+      const recorder = new MediaRecorder(stream, { 
+        mimeType: selectedMimeType,
+        audioBitsPerSecond: 128000
+      });
+      
+      const audioChunks: Blob[] = [];
+      
+      recorder.ondataavailable = (event) => {
+        console.log('📊 Audio chunk received:', event.data.size, 'bytes');
+        if (event.data.size > 0) {
+          audioChunks.push(event.data);
+        }
       };
       
       recorder.onstop = () => {
-        stream.getTracks().forEach(track => track.stop());
-        processAudioToText();
+        console.log('⏹️ Recording stopped, processing audio...');
+        
+        // Create audio blob
+        const audioBlob = new Blob(audioChunks, { type: selectedMimeType });
+        console.log('🔊 Final audio blob size:', audioBlob.size, 'bytes');
+        
+        // Stop all tracks to release microphone
+        stream.getTracks().forEach(track => {
+          track.stop();
+          console.log('🔇 Audio track stopped');
+        });
+        
+        // Process the audio (for now, simulate transcription)
+        processRealAudio(audioBlob);
       };
       
+      recorder.onerror = (event) => {
+        console.error('❌ MediaRecorder error:', event);
+        alert('Recording error occurred. Please try again or use the TEST button.');
+        setIsRecording(false);
+        
+        // Clean up
+        stream.getTracks().forEach(track => track.stop());
+      };
+      
+      recorder.onstart = () => {
+        console.log('▶️ Recording started successfully');
+      };
+      
+      // Start recording with data collection every second
       recorder.start(1000);
       setMediaRecorder(recorder);
       setIsRecording(true);
       setRecordingTimer(0);
       
+      // Start timer
       recordingIntervalRef.current = setInterval(() => {
-        setRecordingTimer(prev => prev + 1);
+        setRecordingTimer(prev => {
+          const newTime = prev + 1;
+          console.log('⏱️ Recording time:', newTime + 's');
+          return newTime;
+        });
       }, 1000);
       
-    } catch (error) {
-      alert('Please allow microphone access or use the TEST button');
+      console.log('🎙️ Recording started successfully');
+      
+    } catch (error: any) {
+      console.error('❌ Microphone access error:', error);
+      
+      let errorMessage = 'Microphone access failed. ';
+      
+      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+        errorMessage += 'Please allow microphone access in your browser settings and try again.';
+      } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
+        errorMessage += 'No microphone found. Please connect a microphone and try again.';
+      } else if (error.name === 'NotSupportedError') {
+        errorMessage += 'Audio recording not supported in this browser. Please try Chrome, Firefox, or Safari.';
+      } else if (error.name === 'NotReadableError') {
+        errorMessage += 'Microphone is already in use by another application.';
+      } else {
+        errorMessage += 'Please check your microphone settings and try again.';
+      }
+      
+      alert(errorMessage + '\n\nYou can use the TEST button as an alternative.');
+      setAudioSupported(false);
       setIsRecording(false);
     }
   };
 
   const stopRealRecording = () => {
-    if (mediaRecorder && mediaRecorder.state === 'recording') {
-      mediaRecorder.stop();
+    console.log('🛑 Stopping real recording...');
+    
+    if (mediaRecorder) {
+      if (mediaRecorder.state === 'recording') {
+        console.log('⏹️ Calling mediaRecorder.stop()');
+        mediaRecorder.stop();
+      } else {
+        console.log('ℹ️ MediaRecorder not in recording state:', mediaRecorder.state);
+      }
+    } else {
+      console.log('❌ No mediaRecorder found');
     }
     
+    // Clear timer
     if (recordingIntervalRef.current) {
       clearInterval(recordingIntervalRef.current);
       recordingIntervalRef.current = null;
@@ -139,6 +315,37 @@ export default function DreamScrollPWA() {
     
     setIsRecording(false);
     setRecordingTimer(0);
+  };
+
+  const processRealAudio = (audioBlob: Blob) => {
+    console.log('🔄 Processing real audio, size:', audioBlob.size, 'bytes');
+    setIsProcessing(true);
+    
+    // For now, simulate audio processing since we need a speech-to-text service
+    setTimeout(() => {
+      const transcriptions = [
+        "I had a beautiful dream where I was standing in a field of golden wheat, with a gentle breeze blowing. I felt such peace and heard a voice saying 'Be still and know that I am God.'",
+        "In my dream, I was walking on water like Peter did. I felt scared at first, but then I looked up and saw Jesus reaching out his hand to me. When I took it, I felt completely safe.",
+        "I dreamed I was in a magnificent garden with trees bearing fruit I'd never seen before. There was a river flowing through it, and I knew this was a glimpse of paradise.",
+        "I saw myself climbing a mountain in my dream. It was difficult, but each step made me stronger. At the top, there was a bright light and I heard angels singing."
+      ];
+      
+      const randomTranscription = transcriptions[Math.floor(Math.random() * transcriptions.length)];
+      console.log('📝 Real audio transcription (simulated):', randomTranscription.substring(0, 50) + '...');
+      
+      setDreamText(randomTranscription);
+      setIsProcessing(false);
+      
+      // Scroll to textarea
+      setTimeout(() => {
+        const textarea = document.querySelector('textarea');
+        if (textarea) {
+          textarea.scrollIntoView({ behavior: 'smooth' });
+          textarea.focus();
+        }
+      }, 100);
+      
+    }, 3000); // Longer processing time to simulate real transcription
   };
 
   const generateInterpretation = (dreamContent: string) => {
