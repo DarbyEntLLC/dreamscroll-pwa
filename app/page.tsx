@@ -361,10 +361,14 @@ export default function DreamScrollPWA() {
                   <div className="relative">
                     <textarea
                       value={dreamText}
-                      onChange={(e) => setDreamText(e.target.value)}
+                      onChange={(e) => {
+                        console.log('Text changed:', e.target.value);
+                        setDreamText(e.target.value);
+                      }}
                       placeholder="Type your dream here or use voice recording above..."
                       disabled={isRecording}
-                      className="w-full h-32 p-4 bg-gray-800 border border-gray-600 rounded-2xl text-white placeholder-gray-400 resize-none focus:outline-none focus:border-purple-400 transition-all"
+                      rows={4}
+                      className="w-full p-4 bg-gray-800 border border-gray-600 rounded-2xl text-white placeholder-gray-400 resize-none focus:outline-none focus:border-purple-400 transition-all"
                     />
                     {dreamText.trim() && !isProcessing && !isRecording && (
                       <button
