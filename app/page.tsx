@@ -86,7 +86,7 @@ export default function DreamScrollPWA() {
       
       recordingIntervalRef.current = setInterval(() => {
         setRecordingTimer(prev => prev + 1);
-      }, 1000);
+      }, 1000) as any;
     } else {
       console.log('Stopping test...');
       setIsRecording(false);
