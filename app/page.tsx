@@ -141,18 +141,33 @@ const DreamScrollPWA: React.FC = () => {
       const chunks: Blob[] = [];
       
       recorder.ondataavailable = (event) => {
+        console.log('Data available:', event.data.size);
         if (event.data.size > 0) {
           chunks.push(event.data);
         }
       };
       
       recorder.onstop = () => {
+        console.log('Recording stopped, processing...');
         const audioBlob = new Blob(chunks, { type: 'audio/webm' });
-        processAudioToText(audioBlob);
+        console.log('Audio blob size:', audioBlob.size);
+        
+        // Clean up stream
         stream.getTracks().forEach(track => track.stop());
+        
+        // Process the audio
+        processAudioToText(audioBlob);
       };
       
-      recorder.start();
+      recorder.onerror = (event) => {
+        console.error('Recording error:', event);
+        setIsRecording(false);
+        setIsProcessing(false);
+        alert('Recording failed. Please try again or use text input.');
+      };
+      
+      // Start recording
+      recorder.start(1000); // Collect data every second
       setMediaRecorder(recorder);
       setIsRecording(true);
       setRecordingTimer(0);
@@ -161,16 +176,27 @@ const DreamScrollPWA: React.FC = () => {
         setRecordingTimer(prev => prev + 1);
       }, 1000);
       
+      console.log('Recording started');
+      
     } catch (error) {
       console.error('Error accessing microphone:', error);
       alert('Please allow microphone access to record dreams, or use the text input instead.');
+      setAudioSupported(false);
     }
   };
 
   const stopRealRecording = () => {
+    console.log('Stop recording called');
     if (mediaRecorder && mediaRecorder.state === 'recording') {
+      console.log('Stopping MediaRecorder...');
       mediaRecorder.stop();
+    } else {
+      console.log('MediaRecorder not recording or not available');
+      // If MediaRecorder fails, at least show the mock transcription
+      setIsRecording(false);
+      processAudioToText(new Blob());
     }
+    
     setIsRecording(false);
     setRecordingTimer(0);
     if (recordingIntervalRef.current) {
@@ -180,18 +206,23 @@ const DreamScrollPWA: React.FC = () => {
   };
 
   const processAudioToText = async (audioBlob: Blob) => {
+    console.log('Processing audio to text...');
     setIsProcessing(true);
     
     // Mock processing - in real app, you'd send to speech-to-text API
     setTimeout(() => {
+      console.log('Transcription complete');
       const mockTranscriptions = [
         "I had a vivid dream where I was walking through a beautiful garden filled with colorful flowers. Suddenly, I noticed a bright light in the sky that seemed to be calling to me. I felt an overwhelming sense of peace and love.",
         "In my dream, I was standing at the edge of a vast ocean. The water was crystal clear, and I could see all the way to the bottom. A voice spoke to me from the waves, telling me not to be afraid.",
         "I dreamed I was in a magnificent temple made of white stone. There were golden pillars everywhere, and the most beautiful music was playing. I felt like I was in the presence of something holy.",
-        "I found myself flying through clouds that looked like cotton candy. Below me was a city made entirely of light. I knew somehow that this was my true home."
+        "I found myself flying through clouds that looked like cotton candy. Below me was a city made entirely of light. I knew somehow that this was my true home.",
+        "I was in a vast library with books that glowed with golden light. Each book contained a different story about God's love. When I opened one, the words floated off the page and surrounded me with warmth."
       ];
       
       const randomTranscription = mockTranscriptions[Math.floor(Math.random() * mockTranscriptions.length)];
+      
+      console.log('Setting dream text:', randomTranscription.substring(0, 50) + '...');
       setDreamText(randomTranscription);
       setIsProcessing(false);
       
