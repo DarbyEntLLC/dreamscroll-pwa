@@ -4,44 +4,14 @@
   "description": "AI-powered biblical dream interpretation with voice recording",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1e1b4b",
+  "background_color": "#0f172a",
   "theme_color": "#8b5cf6",
-  "orientation": "portrait-primary",
+  "orientation": "portrait",
   "scope": "/",
-  "lang": "en",
+  "categories": ["lifestyle", "spirituality", "productivity"],
+  "lang": "en-US",
   "dir": "ltr",
-  "categories": ["lifestyle", "health", "spirituality"],
   "icons": [
-    {
-      "src": "/icon-72.png",
-      "sizes": "72x72",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "/icon-96.png",
-      "sizes": "96x96",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "/icon-128.png",
-      "sizes": "128x128",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "/icon-144.png",
-      "sizes": "144x144",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "/icon-152.png",
-      "sizes": "152x152",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
     {
       "src": "/icon-192.png",
       "sizes": "192x192",
@@ -49,16 +19,15 @@
       "purpose": "maskable any"
     },
     {
-      "src": "/icon-384.png",
-      "sizes": "384x384",
+      "src": "/icon-512.png", 
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable any"
     },
     {
-      "src": "/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable any"
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
     }
   ],
   "screenshots": [
@@ -66,22 +35,44 @@
       "src": "/screenshot-mobile.png",
       "sizes": "390x844",
       "type": "image/png",
-      "form_factor": "narrow"
+      "form_factor": "narrow",
+      "label": "DreamScroll mobile interface"
     }
   ],
   "shortcuts": [
     {
       "name": "Record Dream",
       "short_name": "Record",
-      "description": "Quick access to dream recording",
-      "url": "/?shortcut=record",
+      "description": "Quickly record a new dream",
+      "url": "/?screen=input",
       "icons": [
         {
-          "src": "/icon-96.png",
-          "sizes": "96x96",
-          "type": "image/png"
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Dream Journal",
+      "short_name": "Journal", 
+      "description": "View your dream journal",
+      "url": "/?screen=journal",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
         }
       ]
     }
-  ]
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "features": [
+    "Cross Platform",
+    "fast",
+    "simple"
+  ],
+  "edge_side_panel": {
+    "preferred_width": 400
+  }
 }
