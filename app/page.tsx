@@ -172,8 +172,10 @@ const DreamScrollPWA: React.FC = () => {
       mediaRecorder.stop();
     }
     setIsRecording(false);
+    setRecordingTimer(0);
     if (recordingIntervalRef.current) {
       clearInterval(recordingIntervalRef.current);
+      recordingIntervalRef.current = null;
     }
   };
 
@@ -192,6 +194,15 @@ const DreamScrollPWA: React.FC = () => {
       const randomTranscription = mockTranscriptions[Math.floor(Math.random() * mockTranscriptions.length)];
       setDreamText(randomTranscription);
       setIsProcessing(false);
+      
+      // Auto-scroll to text area so user sees the transcription
+      setTimeout(() => {
+        const textArea = document.querySelector('textarea');
+        if (textArea) {
+          textArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          textArea.focus();
+        }
+      }, 100);
     }, 2000);
   };
 
@@ -580,9 +591,9 @@ const DreamScrollPWA: React.FC = () => {
                   onChange={(e) => setDreamText(e.target.value)}
                   placeholder="Type your dream here or use voice recording above..."
                   className="w-full bg-white/5 border border-white/20 rounded-2xl p-4 text-white placeholder-white/50 min-h-32 resize-none focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20 transition-all"
-                  disabled={isRecording || isProcessing}
+                  disabled={isRecording}
                 />
-                {dreamText.trim() && !isProcessing && (
+                {dreamText.trim() && !isProcessing && !isRecording && (
                   <button
                     onClick={() => {
                       generateInterpretation(dreamText);
