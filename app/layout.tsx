@@ -12,8 +12,12 @@ export const metadata: Metadata = {
     title: 'DreamScroll'
   },
   icons: {
-    icon: '/icon-192.png',
-    apple: '/apple-touch-icon.png'
+    icon: [
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' }
+    ],
+    apple: '/apple-touch-icon.png',
+    shortcut: '/icon-192.png'
   }
 }
 
@@ -25,6 +29,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <link rel="icon" href="/icon-192.png" type="image/png" />
+        <link rel="shortcut icon" href="/icon-192.png" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#8b5cf6" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
