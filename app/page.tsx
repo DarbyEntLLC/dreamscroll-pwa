@@ -1,141 +1,9 @@
-// Home Screen
-  if (currentScreen === 'home') {
-    return (
-      <div className="max-w-sm mx-auto bg-black min-h-screen">
-        <PWAInstallBanner />
-        <OfflineIndicator />
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 to-purple-900 text-white">
-          <div className="p-6 pb-20">
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-200 to-pink-200 bg-clip-text text-transparent">
-                  DreamScroll
-                </h1>
-                <div className="flex items-center space-x-2">
-                  <p className="text-purple-300">Good evening, Dreamer</p>
-                  <div className="flex items-center space-x-1">
-                    {isOnline ? <Wifi className="w-4 h-4 text-green-400" /> : <WifiOff className="w-4 h-4 text-orange-400" />}
-                    {isInstalled && <Download className="w-4 h-4 text-blue-400" title="Installed as PWA" />}
-                  </div>
-                </div>
-              </div>
-              <button
-                onClick={() => setCurrentScreen('profile')}
-                className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center"
-              >
-                <User className="w-6 h-6" />
-              </button>
-            </div>
-
-            <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6 mb-8">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold">Quick Record</h2>
-                <div className="flex items-center space-x-2">
-                  <Moon className="w-6 h-6 text-purple-300" />
-                  {audioSupported && <Mic className="w-5 h-5 text-green-400" />}
-                  {!isOnline && <span className="text-xs bg-orange-500/20 text-orange-300 px-2 py-1 rounded">Offline</span>}
-                </div>
-              </div>
-              <p className="text-white/70 mb-4">
-                Record with voice or type your dream
-              </p>
-              <button
-                onClick={() => setCurrentScreen('input')}
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 py-4 rounded-2xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all transform hover:scale-105"
-              >
-                🎤 Start Recording
-              </button>
-            </div>
-
-            <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6 mb-8">
-              <h3 className="text-lg font-semibold mb-4 flex items-center">
-                <Sparkles className="w-5 h-5 mr-2 text-yellow-300" />
-                Recent Dreams
-              </h3>
-              
-              <div className="space-y-3">
-                {dreams.slice(0, 2).map((dream) => (
-                  <div
-                    key={dream.id}
-                    onClick={() => {
-                      setSelectedDream(dream);
-                      setCurrentScreen('dreamDetail');
-                    }}
-                    className="bg-white/5 rounded-2xl p-4 cursor-pointer hover:bg-white/10 transition-all"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-medium">{dream.title}</h4>
-                      <span className="text-xs text-purple-300">{dream.date}</span>
-                    </div>
-                    <p className="text-sm text-white/70">{dream.content.substring(0, 80)}...</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {installPrompt && !isInstalled && (
-              <div className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 backdrop-blur-lg rounded-3xl p-6 mb-8 border border-purple-500/30">
-                <h3 className="text-lg font-semibold mb-2 flex items-center">
-                  <Download className="w-5 h-5 mr-2 text-purple-300" />
-                  Install DreamScroll
-                </h3>
-                <p className="text-white/70 mb-4 text-sm">
-                  Add DreamScroll to your home screen for faster access and offline functionality.
-                </p>
-                <button
-                  onClick={handleInstallPWA}
-                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 py-3 rounded-2xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all"
-                >
-                  📱 Install as App
-                </button>
-              </div>
-            )}
-          </div>
-
-          <div className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-lg border-t border-white/10">
-            <div className="flex items-center justify-around py-3 px-6 max-w-sm mx-auto">
-              <button
-                onClick={() => setCurrentScreen('home')}
-                className="flex flex-col items-center space-y-1 text-purple-400"
-              >
-                <Moon className="w-6 h-6" />
-                <span className="text-xs">Home</span>
-              </button>
-              
-              <button
-                onClick={() => setCurrentScreen('input')}
-                className="flex flex-col items-center space-y-1 text-white/60"
-              >
-                <Plus className="w-6 h-6" />
-                <span className="text-xs">Record</span>
-              </button>
-              
-              <button
-                onClick={() => setCurrentScreen('journal')}
-                className="flex flex-col items-center space-y-1 text-white/60"
-              >
-                <Book className="w-6 h-6" />
-                <span className="text-xs">Journal</span>
-              </button>
-              
-              <button
-                onClick={() => setCurrentScreen('profile')}
-                className="flex flex-col items-center space-y-1 text-white/60"
-              >
-                <User className="w-6 h-6" />
-                <span className="text-xs">Profile</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }'use client';
+'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   Mic, MicOff, Send, Book, User, ArrowLeft, Plus, 
-  Moon, Sparkles, Brain, Wifi, WifiOff
+  Moon, Sparkles, Brain, Wifi, WifiOff, Download
 } from 'lucide-react';
 
 interface Dream {
@@ -316,10 +184,6 @@ export default function DreamScrollPWA() {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const testVoiceFunction = () => {
-    // TEST button removed - only real recording now
   };
 
   // PWA Install Handler
@@ -622,51 +486,35 @@ export default function DreamScrollPWA() {
     setRecordingTimer(0);
   };
 
-  const processRealAudio = (audioBlob: Blob) => {
-    console.log('🔄 Processing real audio, size:', audioBlob.size, 'bytes');
-    setIsProcessing(true);
-    
-    // For now, simulate audio processing since we need a speech-to-text service
-    setTimeout(() => {
-      const transcriptions = [
-        "I had a beautiful dream where I was standing in a field of golden wheat, with a gentle breeze blowing. I felt such peace and heard a voice saying 'Be still and know that I am God.'",
-        "In my dream, I was walking on water like Peter did. I felt scared at first, but then I looked up and saw Jesus reaching out his hand to me. When I took it, I felt completely safe.",
-        "I dreamed I was in a magnificent garden with trees bearing fruit I'd never seen before. There was a river flowing through it, and I knew this was a glimpse of paradise.",
-        "I saw myself climbing a mountain in my dream. It was difficult, but each step made me stronger. At the top, there was a bright light and I heard angels singing."
-      ];
-      
-      const randomTranscription = transcriptions[Math.floor(Math.random() * transcriptions.length)];
-      console.log('📝 Real audio transcription (simulated):', randomTranscription.substring(0, 50) + '...');
-      
-      setDreamText(randomTranscription);
-      setIsProcessing(false);
-      
-      // Scroll to textarea
-      setTimeout(() => {
-        const textarea = document.querySelector('textarea');
-        if (textarea) {
-          textarea.scrollIntoView({ behavior: 'smooth' });
-          textarea.focus();
-        }
-      }, 100);
-      
-    }, 3000); // Longer processing time to simulate real transcription
-  };
-
   const generateInterpretation = (dreamContent: string) => {
     setIsProcessing(true);
     
     setTimeout(() => {
+      const interpretations = [
+        {
+          interpretation: "Your dream reveals significant spiritual symbolism. The garden represents your spiritual life and growth, while the colorful flowers symbolize the fruits of the Spirit. The bright light calling to you represents divine guidance and God's presence in your life.",
+          themes: ["Spiritual Growth", "Divine Guidance", "Peace", "Awakening"],
+          mood: "Peaceful",
+          symbols: ["Garden", "Light", "Flowers", "Sky"],
+          biblicalRefs: ["John 15:5", "Matthew 5:14", "Galatians 5:22"]
+        },
+        {
+          interpretation: "The ocean represents the vastness of God's love and mercy. Crystal clear water symbolizes purity and truth. The voice from the waves represents God speaking to you, offering comfort and reassurance about your spiritual journey.",
+          themes: ["Trust", "Divine Communication", "Purity", "Faith"],
+          mood: "Reassuring",
+          symbols: ["Ocean", "Water", "Voice", "Clarity"],
+          biblicalRefs: ["Psalm 29:3", "Isaiah 43:2", "Matthew 14:27"]
+        }
+      ];
+      
+      const randomInterpretation = interpretations[Math.floor(Math.random() * interpretations.length)];
+      
       const newDream: Dream = {
         id: dreams.length + 1,
-        title: dreamContent.substring(0, 30) + "...",
+        title: dreamContent.substring(0, 30) + (dreamContent.length > 30 ? "..." : ""),
         date: new Date().toISOString().split('T')[0],
         content: dreamContent,
-        interpretation: "Your dream reveals spiritual symbolism and divine guidance.",
-        themes: ["Spiritual Growth", "Peace"],
-        mood: "Peaceful",
-        symbols: ["Garden", "Light"],
-        biblicalRefs: ["John 15:5"]
+        ...randomInterpretation
       };
       
       setDreams([newDream, ...dreams]);
@@ -761,6 +609,8 @@ export default function DreamScrollPWA() {
   if (currentScreen === 'home') {
     return (
       <div className="max-w-sm mx-auto bg-black min-h-screen">
+        <PWAInstallBanner />
+        <OfflineIndicator />
         <div className="min-h-screen bg-gradient-to-br from-slate-900 to-purple-900 text-white">
           <div className="p-6 pb-20">
             <div className="flex items-center justify-between mb-8">
@@ -770,7 +620,10 @@ export default function DreamScrollPWA() {
                 </h1>
                 <div className="flex items-center space-x-2">
                   <p className="text-purple-300">Good evening, Dreamer</p>
-                  {isOnline ? <Wifi className="w-4 h-4 text-green-400" /> : <WifiOff className="w-4 h-4 text-yellow-400" />}
+                  <div className="flex items-center space-x-1">
+                    {isOnline ? <Wifi className="w-4 h-4 text-green-400" /> : <WifiOff className="w-4 h-4 text-orange-400" />}
+                    {isInstalled && <Download className="w-4 h-4 text-blue-400" title="Installed as PWA" />}
+                  </div>
                 </div>
               </div>
               <button
@@ -787,6 +640,7 @@ export default function DreamScrollPWA() {
                 <div className="flex items-center space-x-2">
                   <Moon className="w-6 h-6 text-purple-300" />
                   {audioSupported && <Mic className="w-5 h-5 text-green-400" />}
+                  {!isOnline && <span className="text-xs bg-orange-500/20 text-orange-300 px-2 py-1 rounded">Offline</span>}
                 </div>
               </div>
               <p className="text-white/70 mb-4">
@@ -825,6 +679,24 @@ export default function DreamScrollPWA() {
                 ))}
               </div>
             </div>
+
+            {installPrompt && !isInstalled && (
+              <div className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 backdrop-blur-lg rounded-3xl p-6 mb-8 border border-purple-500/30">
+                <h3 className="text-lg font-semibold mb-2 flex items-center">
+                  <Download className="w-5 h-5 mr-2 text-purple-300" />
+                  Install DreamScroll
+                </h3>
+                <p className="text-white/70 mb-4 text-sm">
+                  Add DreamScroll to your home screen for faster access and offline functionality.
+                </p>
+                <button
+                  onClick={handleInstallPWA}
+                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 py-3 rounded-2xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all"
+                >
+                  📱 Install as App
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-lg border-t border-white/10">
