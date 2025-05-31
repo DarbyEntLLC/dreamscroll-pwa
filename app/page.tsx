@@ -1134,7 +1134,7 @@ export default function DreamScrollPWA() {
     );
   }
 
-  // Home Screen (and all other screens continue here...)
+  // Home Screen
   if (currentScreen === 'home') {
     return (
       <div className="max-w-sm mx-auto bg-gradient-to-br from-slate-900 to-purple-900 min-h-screen">
@@ -1217,7 +1217,7 @@ export default function DreamScrollPWA() {
                     key={dream.id}
                     onClick={() => {
                       setSelectedDream(dream);
-                      setCurrentScreen('dreamDetail');
+                      setCurrentScreen('interpretation');
                     }}
                     className="bg-white/5 rounded-2xl p-4 cursor-pointer hover:bg-white/10 transition-all group"
                   >
@@ -1550,6 +1550,14 @@ export default function DreamScrollPWA() {
                 <p className="text-white/50">Try searching for different keywords or themes</p>
               </div>
             )}
+
+            {!searchQuery && (
+              <div className="text-center py-12">
+                <Search className="w-16 h-16 text-white/30 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-white/70 mb-2">Search Your Dreams</h3>
+                <p className="text-white/50">Find dreams by title, content, themes, or symbols</p>
+              </div>
+            )}
           </div>
 
           {/* Bottom Navigation */}
@@ -1704,6 +1712,13 @@ export default function DreamScrollPWA() {
                 </button>
               )}
             </div>
+
+            {/* App Info */}
+            <div className="bg-white/5 rounded-2xl p-4 mt-6 text-center">
+              <DreamScrollLogo size={32} className="mx-auto mb-2" />
+              <p className="text-white/50 text-sm">DreamScroll v1.0.0</p>
+              <p className="text-white/40 text-xs">Biblical dream interpretation</p>
+            </div>
           </div>
 
           {/* Bottom Navigation */}
@@ -1755,7 +1770,7 @@ export default function DreamScrollPWA() {
     );
   }
 
-  // Default fallback (shouldn't reach here)
+  // Default fallback
   return (
     <div className="max-w-sm mx-auto bg-black min-h-screen flex items-center justify-center text-white">
       <div className="text-center">
