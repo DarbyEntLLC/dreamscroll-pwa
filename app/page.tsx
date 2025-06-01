@@ -5,75 +5,38 @@ import {
   Mic, MicOff, Send, Book, User, ArrowLeft, Plus, Settings,
   Moon, Sparkles, Brain, Wifi, WifiOff, Download, Share2,
   Search, Filter, Calendar, Clock, Heart, MessageCircle,
-  CheckCircle, Star, BookOpen, Volume2, Pause, Play
+  CheckCircle, Star, BookOpen, Volume2, Pause, Play,
+  TrendingUp, BarChart3, PieChart, Home, Bell, Globe,
+  HelpCircle, Mail, Shield, FileText, LogOut
 } from 'lucide-react';
 
-// Enhanced DreamScroll Logo Component
 const DreamScrollLogo: React.FC<{ size?: number; className?: string }> = ({ size = 32, className = "" }) => {
   return (
     <div className={`flex items-center justify-center ${className}`} style={{ width: size, height: size }}>
-      <svg
-        width={size}
-        height={size}
-        viewBox="0 0 100 100"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
+      <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <radialGradient id="bgGradient" cx="50%" cy="30%" r="70%">
-            <stop offset="0%" stopColor="#8b5cf6" />
-            <stop offset="100%" stopColor="#3730a3" />
+            <stop offset="0%" stopColor="#4A9EFF" />
+            <stop offset="100%" stopColor="#1E3A8A" />
           </radialGradient>
           <linearGradient id="moonGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#fbbf24" />
-            <stop offset="100%" stopColor="#f59e0b" />
+            <stop offset="0%" stopColor="#60A5FA" />
+            <stop offset="100%" stopColor="#3B82F6" />
           </linearGradient>
-          <filter id="glow">
-            <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
-            <feMerge> 
-              <feMergeNode in="coloredBlur"/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
         </defs>
-        
         <circle cx="50" cy="50" r="48" fill="url(#bgGradient)" opacity="0.95" />
-        
-        <circle cx="25" cy="25" r="1.5" fill="#fbbf24" opacity="0.8">
+        <circle cx="25" cy="25" r="1.5" fill="#60A5FA" opacity="0.8">
           <animate attributeName="opacity" values="0.4;1;0.4" dur="2s" repeatCount="indefinite" />
         </circle>
-        <circle cx="75" cy="30" r="1" fill="#fbbf24" opacity="0.6">
+        <circle cx="75" cy="30" r="1" fill="#60A5FA" opacity="0.6">
           <animate attributeName="opacity" values="0.3;0.9;0.3" dur="3s" repeatCount="indefinite" />
         </circle>
-        <circle cx="80" cy="70" r="1.2" fill="#fbbf24" opacity="0.7">
-          <animate attributeName="opacity" values="0.5;1;0.5" dur="2.5s" repeatCount="indefinite" />
-        </circle>
-        
-        <path
-          d="M35 20 C35 20, 25 30, 25 50 C25 70, 35 80, 45 80 C40 80, 35 75, 35 50 C35 25, 40 20, 45 20 Z"
-          fill="url(#moonGradient)"
-          filter="url(#glow)"
-        />
-        
-        <rect x="55" y="35" width="25" height="30" rx="2" fill="#f8fafc" stroke="#e2e8f0" strokeWidth="1" />
-        <rect x="55" y="35" width="25" height="4" rx="2" fill="#e2e8f0" />
-        
-        <line x1="58" y1="45" x2="75" y2="45" stroke="#64748b" strokeWidth="1" opacity="0.8" />
-        <line x1="58" y1="50" x2="77" y2="50" stroke="#64748b" strokeWidth="1" opacity="0.8" />
-        <line x1="58" y1="55" x2="72" y2="55" stroke="#64748b" strokeWidth="1" opacity="0.8" />
-        <line x1="58" y1="60" x2="76" y2="60" stroke="#64748b" strokeWidth="1" opacity="0.8" />
-        
-        <g opacity="0.7">
-          <path d="M70 25 L71 27 L73 26 L71 28 L70 25 Z" fill="#fbbf24">
-            <animateTransform
-              attributeName="transform"
-              type="rotate"
-              values="0 71 26;360 71 26"
-              dur="4s"
-              repeatCount="indefinite"
-            />
-          </path>
-        </g>
+        <path d="M35 20 C35 20, 25 30, 25 50 C25 70, 35 80, 45 80 C40 80, 35 75, 35 50 C35 25, 40 20, 45 20 Z" fill="url(#moonGradient)" />
+        <rect x="55" y="35" width="25" height="30" rx="2" fill="#F8FAFC" stroke="#E2E8F0" strokeWidth="1" />
+        <rect x="55" y="35" width="25" height="4" rx="2" fill="#E2E8F0" />
+        <line x1="58" y1="45" x2="75" y2="45" stroke="#64748B" strokeWidth="1" opacity="0.8" />
+        <line x1="58" y1="50" x2="77" y2="50" stroke="#64748B" strokeWidth="1" opacity="0.8" />
+        <line x1="58" y1="55" x2="72" y2="55" stroke="#64748B" strokeWidth="1" opacity="0.8" />
       </svg>
     </div>
   );
@@ -92,13 +55,15 @@ interface Dream {
   confidence: number;
   tags: string[];
   isBookmarked: boolean;
+  emotionalTone: 'Positive' | 'Neutral' | 'Negative';
   shareId?: string;
 }
 
-type ScreenType = 'onboarding' | 'home' | 'input' | 'journal' | 'dreamDetail' | 'interpretation' | 'profile' | 'search' | 'auth';
+type ScreenType = 'onboarding' | 'home' | 'input' | 'journal' | 'dreamDetail' | 'interpretation' | 'profile' | 'search' | 'auth' | 'trends' | 'settings';
 
 export default function DreamScrollPWA() {
   const [currentScreen, setCurrentScreen] = useState<ScreenType>('onboarding');
+  const [onboardingStep, setOnboardingStep] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTimer, setRecordingTimer] = useState(0);
   const [dreamText, setDreamText] = useState('');
@@ -115,57 +80,70 @@ export default function DreamScrollPWA() {
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const recordingIntervalRef = useRef<any>(null);
-  
-  const [dreams, setDreams] = useState<Dream[]>([
+
+const [dreams, setDreams] = useState<Dream[]>([
     {
       id: 1,
-      title: "Flying Over Golden Mountains",
+      title: "The Whispering Woods",
       date: "2025-05-30",
-      content: "I was soaring high above magnificent golden mountains that stretched endlessly toward the horizon. The peaks gleamed like burnished gold in the sunlight, and I felt an overwhelming sense of freedom and peace. Below me, rivers flowed like liquid silver through green valleys, and I could hear beautiful music coming from somewhere far above.",
-      interpretation: "This dream represents your spiritual ascension and divine calling. The golden mountains symbolize the eternal foundation of God's kingdom and your elevated spiritual perspective. Your ability to fly indicates freedom from earthly limitations and alignment with God's will.",
-      themes: ["Spiritual Elevation", "Divine Freedom", "Heavenly Perspective", "Peace"],
-      mood: "Peaceful",
-      symbols: ["Flying", "Golden Mountains", "Rivers", "Music"],
+      content: "I found myself in a dense forest, the air thick with a strange, whispering sound. The trees were ancient, their branches intertwined, creating a canopy that filtered the sunlight into dappled patterns on the forest floor. As I walked deeper, the whispering grew louder, seeming to emanate from the trees themselves. I felt a mix of fear and curiosity, drawn to uncover the source of the sound. Suddenly, a path appeared, leading to a clearing where a single, luminous flower bloomed. As I reached for it, the whispering ceased, replaced by a profound sense of peace.",
+      interpretation: "This dream may symbolize your journey through the subconscious mind, represented by the dense forest. The whispering could signify the inner voice or intuition, guiding you towards self-discovery. The luminous flower in the clearing might represent a moment of clarity or a realization of inner peace, achieved by confronting and understanding your fears and curiosities.",
+      themes: ["Spiritual Journey", "Inner Voice", "Self-Discovery", "Peace"],
+      mood: "Mysterious",
+      symbols: ["Forest", "Whispering", "Ancient Trees", "Luminous Flower"],
       biblicalRefs: [
         {
-          verse: "Isaiah 40:31",
-          text: "But those who hope in the Lord will renew their strength. They will soar on wings like eagles; they will run and not grow weary, they will walk and not be faint.",
-          relevance: "The flying represents spiritual strength and renewal through faith"
-        },
-        {
-          verse: "Psalm 121:1",
-          text: "I lift up my eyes to the mountains—where does my help come from?",
-          relevance: "Mountains symbolize looking to God for help and strength"
+          verse: "Psalm 23:3",
+          text: "He guides me along the right paths for his name's sake.",
+          relevance: "The path appearing represents divine guidance through life's mysteries"
         }
       ],
-      confidence: 95,
-      tags: ["spiritual", "freedom", "peace"],
-      isBookmarked: true
+      confidence: 88,
+      tags: ["spiritual", "mystery", "guidance"],
+      isBookmarked: true,
+      emotionalTone: 'Positive'
     },
     {
       id: 2,
-      title: "Ocean of Crystal Waters",
+      title: "Flying Over Golden Mountains",
       date: "2025-05-28",
-      content: "I stood on a shore facing an endless ocean of crystal-clear water. The waves were gentle and rhythmic, creating a soothing melody. A warm voice spoke from within the waters, saying 'Peace, be still.' The water began to glow with soft light, and I felt all my worries washing away.",
-      interpretation: "The crystal ocean represents God's perfect peace and cleansing power. The voice speaking 'Peace, be still' echoes Christ's words to the storm, indicating God's authority over the chaos in your life. The glowing water symbolizes divine presence bringing healing and restoration to your spirit.",
-      themes: ["Divine Peace", "Spiritual Cleansing", "God's Voice", "Healing"],
-      mood: "Calming",
-      symbols: ["Ocean", "Crystal Water", "Voice", "Light"],
+      content: "I was soaring high above magnificent golden mountains that stretched endlessly toward the horizon. The peaks gleamed like burnished gold in the sunlight, and I felt an overwhelming sense of freedom and peace.",
+      interpretation: "This dream represents your spiritual ascension and divine calling. The golden mountains symbolize the eternal foundation of God's kingdom.",
+      themes: ["Spiritual Elevation", "Divine Freedom", "Heavenly Perspective"],
+      mood: "Uplifting",
+      symbols: ["Flying", "Golden Mountains", "Sunlight"],
       biblicalRefs: [
         {
-          verse: "Mark 4:39",
-          text: "He got up, rebuked the wind and said to the waves, 'Quiet! Be still!' Then the wind died down and it was completely calm.",
-          relevance: "Direct reference to Christ's power over storms and chaos"
-        },
-        {
-          verse: "Revelation 21:1",
-          text: "Then I saw a new heaven and a new earth, for the first heaven and the first earth had passed away, and there was no longer any sea.",
-          relevance: "The crystal waters represent eternal peace and new creation"
+          verse: "Isaiah 40:31",
+          text: "But those who hope in the Lord will renew their strength. They will soar on wings like eagles.",
+          relevance: "The flying represents spiritual strength and renewal through faith"
         }
       ],
-      confidence: 92,
-      tags: ["peace", "healing", "divine-voice"],
-      isBookmarked: false
+      confidence: 95,
+      tags: ["spiritual", "freedom", "elevation"],
+      isBookmarked: false,
+      emotionalTone: 'Positive'
+    },
+    {
+      id: 3,
+      title: "The Dark Labyrinth",
+      date: "2025-05-26",
+      content: "I was trapped in a dark maze with no clear exit. The walls seemed to shift and change as I walked, making me feel lost and anxious.",
+      interpretation: "This dream reflects feelings of confusion and uncertainty in your waking life. The shifting walls represent changing circumstances.",
+      themes: ["Confusion", "Uncertainty", "Challenge"],
+      mood: "Anxious",
+      symbols: ["Maze", "Dark Walls", "Shifting Paths"],
+      biblicalRefs: [
+        {
+          verse: "Psalm 119:105",
+          text: "Your word is a lamp for my feet, a light on my path.",
+          relevance: "God's guidance can illuminate the path through confusion"
+        }
+      ],
+      confidence: 82,
+      tags: ["challenge", "confusion", "guidance"],
+      isBookmarked: false,
+      emotionalTone: 'Negative'
     }
   ]);
   
@@ -173,118 +151,35 @@ export default function DreamScrollPWA() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      // Check for online/offline status
-      const handleOnline = () => {
-        console.log('🌐 Online');
-        setIsOnline(true);
-      };
-      const handleOffline = () => {
-        console.log('📴 Offline');
-        setIsOnline(false);
-      };
+      const handleOnline = () => setIsOnline(true);
+      const handleOffline = () => setIsOnline(false);
       
       window.addEventListener('online', handleOnline);
       window.addEventListener('offline', handleOffline);
       
-      // PWA install prompt handling
       const handleBeforeInstallPrompt = (e: Event) => {
-        console.log('💾 PWA install prompt available');
         e.preventDefault();
         setInstallPrompt(e);
       };
       
       window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       
-      // Check if already installed
       const checkIfInstalled = () => {
         if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
-          console.log('📱 Running as installed PWA');
-          setIsInstalled(true);
-        } else if ((window.navigator as any).standalone === true) {
-          console.log('🍎 Running as iOS PWA');
           setIsInstalled(true);
         }
       };
       
       checkIfInstalled();
       
-      // Register service worker
-      const registerServiceWorker = async () => {
-        if ('serviceWorker' in navigator) {
-          try {
-            console.log('🔧 Registering service worker...');
-            const registration = await navigator.serviceWorker.register('/sw.js');
-            
-            setSwRegistration(registration);
-            console.log('✅ Service Worker registered successfully');
-            
-            // Handle updates
-            registration.addEventListener('updatefound', () => {
-              console.log('🔄 Service Worker update found');
-              const newWorker = registration.installing;
-              
-              if (newWorker) {
-                newWorker.addEventListener('statechange', () => {
-                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                    console.log('🆕 New Service Worker installed, prompting to reload');
-                    if (confirm('A new version of DreamScroll is available. Reload to update?')) {
-                      window.location.reload();
-                    }
-                  }
-                });
-              }
-            });
-            
-          } catch (error) {
-            console.error('❌ Service Worker registration failed:', error);
-          }
-        } else {
-          console.log('❌ Service Workers not supported');
-        }
-      };
-      
-      registerServiceWorker();
-      
-      // Enhanced audio support detection
       const checkAudioSupport = async () => {
-        console.log('🔍 Checking audio support...');
-        
         try {
-          // Check for Web Speech API first (more reliable for speech recognition)
           const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-          
           if (SpeechRecognition) {
-            console.log('✅ Web Speech API available');
-            const recognition = new SpeechRecognition();
-            setSpeechRecognition(recognition);
+            setSpeechRecognition(new SpeechRecognition());
             setAudioSupported(true);
-            return;
           }
-          
-          // Fallback to MediaRecorder
-          if (!navigator.mediaDevices) {
-            console.log('❌ MediaDevices API not available');
-            setAudioSupported(false);
-            return;
-          }
-          
-          if (typeof navigator.mediaDevices.getUserMedia !== 'function') {
-            console.log('❌ getUserMedia not available');
-            setAudioSupported(false);
-            return;
-          }
-          
-          if (typeof MediaRecorder === 'undefined') {
-            console.log('❌ MediaRecorder not available');
-            setAudioSupported(false);
-            return;
-          }
-          
-          console.log('✅ MediaRecorder support detected');
-          setAudioSupported(true);
-          
         } catch (error) {
-          console.error('❌ Error checking audio support:', error);
           setAudioSupported(false);
         }
       };
@@ -305,81 +200,29 @@ export default function DreamScrollPWA() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // PWA Install Handler
-  const handleInstallPWA = async () => {
-    if (installPrompt) {
-      console.log('📱 Triggering PWA install prompt');
-      (installPrompt as any).prompt();
-      const result = await (installPrompt as any).userChoice;
-      
-      if (result.outcome === 'accepted') {
-        console.log('✅ User accepted PWA install');
-        setInstallPrompt(null);
-        setIsInstalled(true);
-      } else {
-        console.log('❌ User declined PWA install');
-      }
-    }
-  };
-
-  // Enhanced AI Interpretation with more sophisticated prompts
   const generateAdvancedInterpretation = (dreamContent: string) => {
     setIsProcessing(true);
     
     setTimeout(() => {
-      // More sophisticated interpretation logic
       const interpretations = [
         {
-          interpretation: "Your dream reveals profound spiritual symbolism deeply rooted in biblical imagery. The garden represents your spiritual life and growth, reflecting the Garden of Eden where humanity first communed with God. The vibrant, colorful flowers symbolize the fruits of the Spirit as mentioned in Galatians 5:22-23, indicating spiritual maturity and divine blessing in your life. The bright, calling light represents the glory and presence of God, drawing you closer to His divine purpose. This dream suggests you are entering a season of spiritual awakening and deeper intimacy with the Creator.",
-          themes: ["Spiritual Awakening", "Divine Intimacy", "Fruit of the Spirit", "God's Calling"],
+          interpretation: "Your dream reveals profound spiritual symbolism deeply rooted in biblical imagery. This represents a divine calling and spiritual awakening in your life.",
+          themes: ["Spiritual Awakening", "Divine Calling", "Inner Peace"],
           mood: "Spiritually Uplifting",
-          symbols: ["Garden", "Flowers", "Light", "Divine Voice"],
+          symbols: ["Light", "Path", "Voice"],
           biblicalRefs: [
             {
-              verse: "John 15:5",
-              text: "I am the vine; you are the branches. If you remain in me and I in you, you will bear much fruit; apart from me you can do nothing.",
-              relevance: "The garden and flowers represent your connection to Christ and bearing spiritual fruit"
-            },
-            {
-              verse: "Matthew 5:14",
-              text: "You are the light of the world. A town built on a hill cannot be hidden.",
-              relevance: "The bright light calling to you represents your calling to be a light for others"
-            },
-            {
-              verse: "Galatians 5:22-23",
-              text: "But the fruit of the Spirit is love, joy, peace, forbearance, kindness, goodness, faithfulness, gentleness and self-control.",
-              relevance: "The colorful flowers symbolize the manifestation of spiritual fruits in your life"
+              verse: "John 14:6",
+              text: "Jesus answered, 'I am the way and the truth and the life.'",
+              relevance: "The path in your dream represents Christ as the way to spiritual truth"
             }
           ],
-          confidence: 94
-        },
-        {
-          interpretation: "The ocean in your dream represents the vastness and depth of God's love and mercy, as described in Psalm 103:11. The crystal-clear water symbolizes purity, truth, and the cleansing power of God's Word. When you hear the voice from the waves, this echoes Christ's authority over the natural world, as demonstrated when He calmed the storm in Mark 4:39. This divine communication suggests God is speaking peace into the turbulent areas of your life, offering comfort and reassurance about your spiritual journey. The dream indicates a time of divine intervention and supernatural peace.",
-          themes: ["Divine Love", "Spiritual Cleansing", "God's Authority", "Supernatural Peace"],
-          mood: "Deeply Peaceful",
-          symbols: ["Ocean", "Crystal Water", "Divine Voice", "Stillness"],
-          biblicalRefs: [
-            {
-              verse: "Psalm 29:3",
-              text: "The voice of the Lord is over the waters; the God of glory thunders, the Lord thunders over the mighty waters.",
-              relevance: "God's voice speaking through water represents His power and presence"
-            },
-            {
-              verse: "Isaiah 43:2",
-              text: "When you pass through the waters, I will be with you; and when you pass through the rivers, they will not sweep over you.",
-              relevance: "God's protection and presence during challenging times"
-            },
-            {
-              verse: "Matthew 14:27",
-              text: "But Jesus immediately said to them: 'Take courage! It is I. Don't be afraid.'",
-              relevance: "Christ's reassuring voice bringing peace and courage"
-            }
-          ],
-          confidence: 96
+          confidence: 94,
+          emotionalTone: 'Positive' as const
         }
       ];
       
-      const randomInterpretation = interpretations[Math.floor(Math.random() * interpretations.length)];
+      const randomInterpretation = interpretations[0];
       
       const newDream: Dream = {
         id: dreams.length + 1,
@@ -395,234 +238,79 @@ export default function DreamScrollPWA() {
       setSelectedDream(newDream);
       setIsProcessing(false);
       setCurrentScreen('interpretation');
-    }, 4000); // Longer processing time for more sophisticated analysis
+    }, 3000);
   };
 
   const startRealRecording = async () => {
-    console.log('🎤 Starting voice recognition...');
-    
     if (!audioSupported) {
-      console.log('❌ Audio not supported');
-      alert('Voice recording not supported in this browser. Please use Chrome, Firefox, or Safari.');
+      alert('Voice recording not supported in this browser.');
       return;
     }
 
     try {
-      // Try Web Speech API first (best for speech recognition)
       if (speechRecognition) {
-        console.log('🗣️ Using Web Speech API');
-        startSpeechRecognition();
-        return;
-      }
-      
-      // Fallback to MediaRecorder
-      console.log('🎙️ Using MediaRecorder fallback');
-      await startMediaRecorder();
-      
-    } catch (error: any) {
-      console.error('❌ Recording failed:', error);
-      alert('Voice recording failed. Please check your microphone permissions and try again.');
-      setIsRecording(false);
-    }
-  };
-
-  const startSpeechRecognition = () => {
-    if (!speechRecognition) return;
-    
-    console.log('🎯 Starting Speech Recognition');
-    
-    // Configure speech recognition
-    speechRecognition.continuous = true;
-    speechRecognition.interimResults = true;
-    speechRecognition.lang = 'en-US';
-    speechRecognition.maxAlternatives = 1;
-    
-    let finalTranscript = '';
-    let interimTranscript = '';
-    
-    speechRecognition.onstart = () => {
-      console.log('✅ Speech recognition started');
-      setIsRecording(true);
-      setIsListening(true);
-      setRecordingTimer(0);
-      
-      recordingIntervalRef.current = setInterval(() => {
-        setRecordingTimer(prev => prev + 1);
-      }, 1000);
-    };
-    
-    speechRecognition.onresult = (event: any) => {
-      interimTranscript = '';
-      
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;
+        speechRecognition.continuous = true;
+        speechRecognition.interimResults = true;
+        speechRecognition.lang = 'en-US';
         
-        if (event.results[i].isFinal) {
-          finalTranscript += transcript + ' ';
-          console.log('📝 Final transcript chunk:', transcript);
-        } else {
-          interimTranscript += transcript;
-          console.log('🔄 Interim transcript:', transcript);
-        }
+        let finalTranscript = '';
+        
+        speechRecognition.onstart = () => {
+          setIsRecording(true);
+          setIsListening(true);
+          setRecordingTimer(0);
+          
+          recordingIntervalRef.current = setInterval(() => {
+            setRecordingTimer(prev => prev + 1);
+          }, 1000);
+        };
+        
+        speechRecognition.onresult = (event: any) => {
+          let interimTranscript = '';
+          
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            
+            if (event.results[i].isFinal) {
+              finalTranscript += transcript + ' ';
+            } else {
+              interimTranscript += transcript;
+            }
+          }
+          
+          const currentText = finalTranscript + interimTranscript;
+          if (currentText.trim()) {
+            setDreamText(currentText.trim());
+          }
+        };
+        
+        speechRecognition.onend = () => {
+          setIsRecording(false);
+          setIsListening(false);
+          
+          if (recordingIntervalRef.current) {
+            clearInterval(recordingIntervalRef.current);
+            recordingIntervalRef.current = null;
+          }
+          
+          if (finalTranscript.trim()) {
+            setDreamText(finalTranscript.trim());
+          }
+        };
+        
+        speechRecognition.start();
       }
-      
-      // Update the text area with current transcription
-      const currentText = finalTranscript + interimTranscript;
-      if (currentText.trim()) {
-        setDreamText(currentText.trim());
-      }
-    };
-    
-    speechRecognition.onend = () => {
-      console.log('⏹️ Speech recognition ended');
+    } catch (error) {
+      alert('Voice recording failed. Please try again.');
       setIsRecording(false);
-      setIsListening(false);
-      
-      if (recordingIntervalRef.current) {
-        clearInterval(recordingIntervalRef.current);
-        recordingIntervalRef.current = null;
-      }
-      
-      // Use the final transcript
-      if (finalTranscript.trim()) {
-        console.log('✅ Final transcription:', finalTranscript);
-        setDreamText(finalTranscript.trim());
-      } else if (!dreamText.trim()) {
-        console.log('ℹ️ No speech detected');
-        alert('No speech was detected. Please try speaking louder or closer to your microphone.');
-      }
-    };
-    
-    speechRecognition.onerror = (event: any) => {
-      console.error('❌ Speech recognition error:', event.error);
-      setIsRecording(false);
-      setIsListening(false);
-      
-      if (recordingIntervalRef.current) {
-        clearInterval(recordingIntervalRef.current);
-        recordingIntervalRef.current = null;
-      }
-      
-      let errorMessage = 'Speech recognition failed. ';
-      switch (event.error) {
-        case 'no-speech':
-          errorMessage += 'No speech was detected. Please try again.';
-          break;
-        case 'audio-capture':
-          errorMessage += 'No microphone found or permission denied.';
-          break;
-        case 'not-allowed':
-          errorMessage += 'Please allow microphone access and try again.';
-          break;
-        case 'network':
-          errorMessage += 'Network error. Please check your internet connection.';
-          break;
-        default:
-          errorMessage += 'Please try again.';
-      }
-      
-      alert(errorMessage);
-    };
-    
-    // Start recognition
-    speechRecognition.start();
-  };
-
-  const startMediaRecorder = async () => {
-    console.log('🔍 Requesting microphone access...');
-    
-    const stream = await navigator.mediaDevices.getUserMedia({ 
-      audio: {
-        echoCancellation: true,
-        noiseSuppression: true,
-        autoGainControl: true,
-        sampleRate: 44100
-      } 
-    });
-    
-    console.log('✅ Microphone access granted');
-    
-    const mimeTypes = [
-      'audio/webm;codecs=opus',
-      'audio/webm',
-      'audio/mp4',
-      'audio/ogg;codecs=opus'
-    ];
-    
-    let selectedMimeType = '';
-    for (const mimeType of mimeTypes) {
-      if (MediaRecorder.isTypeSupported(mimeType)) {
-        selectedMimeType = mimeType;
-        break;
-      }
     }
-    
-    if (!selectedMimeType) {
-      throw new Error('No supported audio format found');
-    }
-    
-    const recorder = new MediaRecorder(stream, { 
-      mimeType: selectedMimeType,
-      audioBitsPerSecond: 128000
-    });
-    
-    const audioChunks: Blob[] = [];
-    
-    recorder.ondataavailable = (event) => {
-      if (event.data.size > 0) {
-        audioChunks.push(event.data);
-      }
-    };
-    
-    recorder.onstop = () => {
-      console.log('⏹️ MediaRecorder stopped');
-      
-      const audioBlob = new Blob(audioChunks, { type: selectedMimeType });
-      console.log('🔊 Audio blob size:', audioBlob.size, 'bytes');
-      
-      stream.getTracks().forEach(track => track.stop());
-      
-      // For MediaRecorder, we'll need to implement speech-to-text service
-      // For now, inform user that transcription isn't available
-      if (audioBlob.size > 1000) {
-        alert('Audio recorded successfully, but automatic transcription requires a speech-to-text service. Please type your dream manually.');
-      } else {
-        alert('No audio was recorded. Please check your microphone and try again.');
-      }
-    };
-    
-    recorder.onerror = (event) => {
-      console.error('❌ MediaRecorder error:', event);
-      stream.getTracks().forEach(track => track.stop());
-      throw new Error('Recording failed');
-    };
-    
-    recorder.start(1000);
-    setMediaRecorder(recorder);
-    setIsRecording(true);
-    setRecordingTimer(0);
-    
-    recordingIntervalRef.current = setInterval(() => {
-      setRecordingTimer(prev => prev + 1);
-    }, 1000);
   };
 
   const stopRealRecording = () => {
-    console.log('🛑 Stopping recording...');
-    
-    // Stop speech recognition if active
     if (speechRecognition && isListening) {
-      console.log('⏹️ Stopping speech recognition');
       speechRecognition.stop();
     }
     
-    // Stop media recorder if active
-    if (mediaRecorder && mediaRecorder.state === 'recording') {
-      console.log('⏹️ Stopping media recorder');
-      mediaRecorder.stop();
-    }
-    
-    // Clear timer
     if (recordingIntervalRef.current) {
       clearInterval(recordingIntervalRef.current);
       recordingIntervalRef.current = null;
@@ -641,22 +329,6 @@ export default function DreamScrollPWA() {
     ));
   };
 
-  const shareDream = (dream: Dream) => {
-    if (navigator.share) {
-      navigator.share({
-        title: `Dream: ${dream.title}`,
-        text: `I had an interesting dream: "${dream.content.substring(0, 100)}..."`,
-        url: window.location.href
-      });
-    } else {
-      // Fallback for browsers without Web Share API
-      navigator.clipboard.writeText(
-        `Dream: ${dream.title}\n\n${dream.content}\n\nInterpretation: ${dream.interpretation}`
-      );
-      alert('Dream copied to clipboard!');
-    }
-  };
-
   const filteredDreams = dreams.filter(dream => {
     const matchesSearch = searchQuery === '' || 
       dream.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -670,463 +342,108 @@ export default function DreamScrollPWA() {
     return matchesSearch && matchesFilter;
   });
 
-  // PWA Install Banner Component
-  const PWAInstallBanner = () => {
-    if (!installPrompt || isInstalled) return null;
+  const getDreamFrequencyData = () => {
+    const last30Days = Array.from({length: 30}, (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() - (29 - i));
+      return date.toISOString().split('T')[0];
+    });
     
-    return (
-      <div className="fixed top-4 left-4 right-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl p-4 z-50 mx-auto max-w-sm shadow-2xl border border-purple-400/30">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Download className="w-6 h-6 text-white" />
-            <div>
-              <p className="font-semibold text-white">Install DreamScroll</p>
-              <p className="text-xs text-white/80">Add to home screen for better experience</p>
-            </div>
-          </div>
-          <div className="flex space-x-2">
-            <button 
-              onClick={() => setInstallPrompt(null)}
-              className="text-white/60 hover:text-white transition-colors text-lg"
-              title="Dismiss"
-            >
-              ✕
-            </button>
-            <button 
-              onClick={handleInstallPWA}
-              className="bg-white/20 px-3 py-1 rounded-lg text-white text-sm font-semibold hover:bg-white/30 transition-colors backdrop-blur-sm"
-            >
-              Install
-            </button>
-          </div>
-        </div>
-      </div>
-    );
+    return last30Days.map(date => {
+      const dreamCount = dreams.filter(dream => dream.date === date).length;
+      return dreamCount;
+    });
   };
 
-  // Offline Indicator Component
-  const OfflineIndicator = () => {
-    if (isOnline) return null;
+  const getEmotionalToneData = () => {
+    const positive = dreams.filter(d => d.emotionalTone === 'Positive').length;
+    const neutral = dreams.filter(d => d.emotionalTone === 'Neutral').length;
+    const negative = dreams.filter(d => d.emotionalTone === 'Negative').length;
+    const total = dreams.length;
     
-    return (
-      <div className="fixed top-4 left-4 right-4 bg-orange-600 rounded-xl p-3 z-40 mx-auto max-w-sm shadow-xl border border-orange-400/30">
-        <div className="flex items-center justify-center space-x-2">
-          <WifiOff className="w-5 h-5 text-white" />
-          <span className="text-white font-semibold text-sm">You're offline - some features may be limited</span>
-        </div>
-      </div>
-    );
+    return {
+      positive: total > 0 ? Math.round((positive / total) * 100) : 0,
+      neutral: total > 0 ? Math.round((neutral / total) * 100) : 0,
+      negative: total > 0 ? Math.round((negative / total) * 100) : 0
+    };
   };
 
-  // Authentication Screen
-  if (currentScreen === 'auth') {
-    return (
-      <div className="max-w-sm mx-auto bg-gradient-to-br from-slate-900 via-purple-900 to-indigo-900 min-h-screen">
-        <PWAInstallBanner />
-        <OfflineIndicator />
-        <div className="min-h-screen flex flex-col items-center justify-center p-6 text-white">
-          <div className="w-full max-w-md space-y-8">
-            <div className="text-center">
-              <DreamScrollLogo size={80} className="mx-auto mb-6" />
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-200 to-pink-200 bg-clip-text text-transparent mb-2">
-                Welcome Back
-              </h1>
-              <p className="text-purple-300">Sign in to access your personal dream journal</p>
-            </div>
+  const getRecurringSymbols = () => {
+    const symbolCounts: { [key: string]: number } = {};
+    dreams.forEach(dream => {
+      dream.symbols.forEach(symbol => {
+        symbolCounts[symbol] = (symbolCounts[symbol] || 0) + 1;
+      });
+    });
+    
+    return Object.entries(symbolCounts)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 6)
+      .map(([symbol, count]) => ({ symbol, count }));
+  };
 
-            <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-2xl">
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-purple-200 mb-2">Email</label>
-                  <input
-                    type="email"
-                    className="w-full p-4 rounded-2xl bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:border-purple-400 focus:bg-white/15 transition-all"
-                    placeholder="your@email.com"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-purple-200 mb-2">Password</label>
-                  <input
-                    type="password"
-                    className="w-full p-4 rounded-2xl bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:border-purple-400 focus:bg-white/15 transition-all"
-                    placeholder="••••••••"
-                  />
-                </div>
-
-                <button
-                  onClick={() => {
-                    setIsAuthenticated(true);
-                    setCurrentScreen('home');
-                  }}
-                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 py-4 rounded-2xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all transform hover:scale-105 shadow-lg"
-                >
-                  Sign In
-                </button>
-
-                <div className="text-center">
-                  <button className="text-purple-300 hover:text-white transition-colors text-sm">
-                    Don't have an account? Sign up
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <button
-              onClick={() => {
-                setIsAuthenticated(false);
-                setCurrentScreen('home');
-              }}
-              className="w-full text-center text-purple-300 hover:text-white transition-colors"
-            >
-              Continue as Guest
-            </button>
-          </div>
-        </div>
+// NAVIGATION COMPONENT
+  const BottomNav = ({ activeScreen }: { activeScreen: string }) => (
+    <div className="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-xl border-t border-gray-700/50">
+      <div className="flex items-center justify-around py-3 px-6 max-w-sm mx-auto">
+        <button onClick={() => setCurrentScreen('home')} className={`flex flex-col items-center space-y-1 ${activeScreen === 'home' ? 'text-blue-400' : 'text-gray-400 hover:text-white'} transition-colors`}>
+          <Home className="w-6 h-6" />
+          <span className="text-xs">Home</span>
+        </button>
+        <button onClick={() => setCurrentScreen('input')} className={`flex flex-col items-center space-y-1 ${activeScreen === 'input' ? 'text-blue-400' : 'text-gray-400 hover:text-white'} transition-colors`}>
+          <Plus className="w-6 h-6" />
+          <span className="text-xs">Record</span>
+        </button>
+        <button onClick={() => setCurrentScreen('trends')} className={`flex flex-col items-center space-y-1 ${activeScreen === 'trends' ? 'text-blue-400' : 'text-gray-400 hover:text-white'} transition-colors`}>
+          <BarChart3 className="w-6 h-6" />
+          <span className="text-xs">Trends</span>
+        </button>
+        <button onClick={() => setCurrentScreen('journal')} className={`flex flex-col items-center space-y-1 ${activeScreen === 'journal' ? 'text-blue-400' : 'text-gray-400 hover:text-white'} transition-colors`}>
+          <BookOpen className="w-6 h-6" />
+          <span className="text-xs">Journal</span>
+        </button>
+        <button onClick={() => setCurrentScreen('profile')} className={`flex flex-col items-center space-y-1 ${activeScreen === 'profile' ? 'text-blue-400' : 'text-gray-400 hover:text-white'} transition-colors`}>
+          <User className="w-6 h-6" />
+          <span className="text-xs">Profile</span>
+        </button>
       </div>
-    );
-  }
+    </div>
+  );
 
-  // Onboarding Screen
+  // ONBOARDING SCREEN
   if (currentScreen === 'onboarding') {
+    const onboardingScreens = [
+      { title: "Record your dreams", description: "Capture the essence of your dreams with our intuitive recording feature. Speak or type to document every detail, ensuring no dream is forgotten.", icon: <Mic className="w-16 h-16 text-blue-400" /> },
+      { title: "Access your journal", description: "Easily revisit your dream journal, where all your recorded dreams are stored. Search, filter, and organize your entries for quick access and reflection.", icon: <BookOpen className="w-16 h-16 text-blue-400" /> },
+      { title: "Analyze your trends", description: "Discover patterns and insights in your dreams with our trend analysis tools. Track recurring themes, emotions, and symbols to understand your subconscious better.", icon: <TrendingUp className="w-16 h-16 text-blue-400" /> }
+    ];
+
+    const currentOnboardingScreen = onboardingScreens[onboardingStep];
+
     return (
-      <div className="max-w-sm mx-auto bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 min-h-screen">
-        <PWAInstallBanner />
-        <OfflineIndicator />
-        <div className="min-h-screen flex flex-col items-center justify-center p-6 text-white">
-          <div className="text-center space-y-8 max-w-md">
-            <div className="relative">
-              <div className="w-32 h-32 mx-auto bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center shadow-2xl">
-                <DreamScrollLogo size={64} />
-              </div>
-              <Sparkles className="w-8 h-8 absolute top-4 right-8 text-yellow-300 animate-pulse" />
-            </div>
-            
-            <div>
-              <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-200 to-pink-200 bg-clip-text text-transparent">
-                DreamScroll
-              </h1>
-              <p className="text-xl text-purple-200 mb-4">
-                AI-powered biblical dream interpretation
-              </p>
-              <div className="flex items-center justify-center space-x-2 text-sm text-purple-300">
-                <Wifi className="w-4 h-4" />
-                <span>Voice recording • Offline capable • Biblical insights</span>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3 text-left bg-white/10 rounded-2xl p-4 backdrop-blur-sm">
-                <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
-                  <Mic className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-semibold">Voice Recording</h3>
-                  <p className="text-sm text-purple-200">Record dreams with your voice</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-3 text-left bg-white/10 rounded-2xl p-4 backdrop-blur-sm">
-                <div className="w-10 h-10 bg-pink-600 rounded-full flex items-center justify-center">
-                  <Brain className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-semibold">AI Interpretation</h3>
-                  <p className="text-sm text-purple-200">Biblical insights powered by AI</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-3 text-left bg-white/10 rounded-2xl p-4 backdrop-blur-sm">
-                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                  <BookOpen className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-semibold">Personal Journal</h3>
-                  <p className="text-sm text-purple-200">Save and organize your dreams</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <button
-                onClick={() => setCurrentScreen('auth')}
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 py-4 rounded-2xl font-semibold text-lg hover:from-purple-600 hover:to-pink-600 transition-all transform hover:scale-105 shadow-lg"
-              >
-                Get Started
-              </button>
-              
-              {installPrompt && !isInstalled && (
-                <button
-                  onClick={handleInstallPWA}
-                  className="w-full bg-white/10 border border-white/20 py-3 rounded-2xl font-semibold hover:bg-white/20 transition-all backdrop-blur-sm"
-                >
-                  📱 Install as App
-                </button>
-              )}
+      <div className="max-w-sm mx-auto bg-gray-900 min-h-screen relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-blue-900/20 to-gray-900"></div>
+        <div className="relative z-10 min-h-screen flex flex-col">
+          <div className="flex justify-center pt-16 pb-8">
+            <div className="flex space-x-2">
+              {onboardingScreens.map((_, index) => (
+                <div key={index} className={`w-2 h-2 rounded-full transition-all duration-300 ${index === onboardingStep ? 'bg-blue-400 w-6' : 'bg-gray-600'}`} />
+              ))}
             </div>
           </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Enhanced Input Screen
-  if (currentScreen === 'input') {
-    return (
-      <div className="max-w-sm mx-auto bg-gradient-to-br from-slate-900 to-indigo-900 min-h-screen">
-        <OfflineIndicator />
-        <div className="min-h-screen text-white">
-          <div className="p-6 pb-24">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-8">
-              <button 
-                onClick={() => setCurrentScreen('home')}
-                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <h2 className="text-2xl font-bold">Record Dream</h2>
-              <div className="w-10 h-10"></div>
-            </div>
-
-            {/* Recording Interface */}
-            <div className="space-y-6">
-              <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-xl">
-                <h3 className="text-lg font-semibold mb-6 flex items-center">
-                  <DreamScrollLogo size={20} className="mr-2" />
-                  Describe Your Dream
-                </h3>
-                
-                <div className="space-y-6">
-                  {/* Voice Recording Section */}
-                  <div className="text-center">
-                    <div className="relative inline-block">
-                      <button
-                        onClick={isRecording ? stopRealRecording : startRealRecording}
-                        disabled={!audioSupported}
-                        className={`w-24 h-24 rounded-full flex items-center justify-center transition-all shadow-2xl relative ${
-                          isRecording 
-                            ? 'bg-red-500 animate-pulse shadow-red-500/50 scale-110' 
-                            : audioSupported
-                            ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 shadow-purple-500/50 hover:scale-105'
-                            : 'bg-gray-500 cursor-not-allowed'
-                        }`}
-                        title={audioSupported ? (isRecording ? 'Stop Recording' : 'Start Voice Recording') : 'Microphone not available'}
-                      >
-                        {isRecording ? <MicOff className="w-10 h-10" /> : <Mic className="w-10 h-10" />}
-                        {isRecording && (
-                          <div className="absolute inset-0 rounded-full border-4 border-white/30 animate-ping"></div>
-                        )}
-                      </button>
-                    </div>
-                    
-                    <div className="mt-4">
-                      <p className="text-purple-200 mb-2 font-medium">
-                        {isRecording 
-                          ? `🎤 ${isListening ? 'Listening' : 'Recording'}... ${formatTime(recordingTimer)}` 
-                          : audioSupported 
-                          ? 'Tap the microphone to start voice recording'
-                          : 'Voice recording not available - please type your dream below'
-                        }
-                      </p>
-                      
-                      {isRecording && (
-                        <div className="space-y-3">
-                          <div className="flex justify-center space-x-1">
-                            <div className="w-2 h-2 bg-red-400 rounded-full animate-bounce"></div>
-                            <div className="w-2 h-2 bg-red-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                            <div className="w-2 h-2 bg-red-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                          </div>
-                          {isListening && (
-                            <div className="bg-green-500/20 rounded-2xl p-3 border border-green-400/30">
-                              <p className="text-green-300 text-sm font-medium">
-                                🗣️ Speak now - your words will appear below
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      
-                      {isProcessing && (
-                        <div className="bg-yellow-500/20 rounded-2xl p-3 border border-yellow-400/30">
-                          <div className="flex items-center justify-center space-x-2">
-                            <Sparkles className="w-5 h-5 text-yellow-300 animate-spin" />
-                            <p className="text-yellow-300 text-sm font-medium">Processing speech...</p>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {!audioSupported && (
-                        <div className="bg-orange-500/20 rounded-2xl p-3 border border-orange-400/30">
-                          <p className="text-orange-300 text-sm">
-                            💡 Voice recording requires Chrome, Firefox, or Safari
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Text Input */}
-                  <div className="relative">
-                    <textarea
-                      value={dreamText}
-                      onChange={(e) => setDreamText(e.target.value)}
-                      placeholder="Type your dream here or use voice recording above..."
-                      disabled={isRecording}
-                      rows={6}
-                      className="w-full p-4 rounded-2xl bg-white/10 border border-white/20 text-white placeholder-white/50 resize-none focus:outline-none focus:border-purple-400 focus:bg-white/15 transition-all backdrop-blur-sm"
-                    />
-                    {dreamText.trim() && !isProcessing && !isRecording && (
-                      <button
-                        onClick={() => {
-                          const textToProcess = dreamText;
-                          setDreamText('');
-                          generateAdvancedInterpretation(textToProcess);
-                        }}
-                        className="absolute bottom-4 right-4 bg-gradient-to-r from-purple-500 to-pink-500 p-3 rounded-full hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg hover:scale-105"
-                      >
-                        <Send className="w-5 h-5" />
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Quick Tips */}
-                  <div className="bg-blue-500/10 rounded-2xl p-4 border border-blue-400/20">
-                    <h4 className="text-blue-300 font-medium mb-2">💡 Recording Tips</h4>
-                    <ul className="text-blue-200 text-sm space-y-1">
-                      <li>• Speak clearly and at a normal pace</li>
-                      <li>• Include emotions and colors you remember</li>
-                      <li>• Describe the setting and people involved</li>
-                      <li>• Mention any symbols or unusual elements</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div className="flex-1 px-6 flex flex-col items-center justify-center text-center">
+            <div className="mb-8">{currentOnboardingScreen.icon}</div>
+            <h1 className="text-3xl font-bold text-white mb-4">{currentOnboardingScreen.title}</h1>
+            <p className="text-gray-300 text-lg leading-relaxed mb-12 max-w-sm">{currentOnboardingScreen.description}</p>
           </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Enhanced Interpretation Screen
-  if (currentScreen === 'interpretation') {
-    if (!selectedDream) {
-      return <div className="max-w-sm mx-auto bg-black min-h-screen flex items-center justify-center text-white">Loading...</div>;
-    }
-    
-    return (
-      <div className="max-w-sm mx-auto bg-gradient-to-br from-slate-900 to-purple-900 min-h-screen">
-        <div className="min-h-screen text-white">
-          <div className="p-6 pb-24">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-8">
-              <button 
-                onClick={() => setCurrentScreen('home')}
-                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <h2 className="text-xl font-bold">Dream Interpretation</h2>
-              <button
-                onClick={() => shareDream(selectedDream)}
-                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
-              >
-                <Share2 className="w-5 h-5" />
-              </button>
-            </div>
-
-            {isProcessing ? (
-              <div className="flex flex-col items-center justify-center py-20">
-                <div className="w-24 h-24 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mb-6 shadow-2xl">
-                  <Brain className="w-12 h-12 animate-spin" />
-                </div>
-                <h3 className="text-2xl font-semibold mb-4">Analyzing Your Dream</h3>
-                <p className="text-purple-200 text-center max-w-sm mb-6">
-                  Our AI is interpreting the biblical symbolism and spiritual meaning...
-                </p>
-                <div className="flex space-x-2">
-                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                </div>
-              </div>
+          <div className="p-6 space-y-4">
+            {onboardingStep < onboardingScreens.length - 1 ? (
+              <button onClick={() => setOnboardingStep(onboardingStep + 1)} className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 rounded-xl transition-all duration-200">Next</button>
             ) : (
-              <div className="space-y-6">
-                {/* Dream Title & Stats */}
-                <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-xl">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-bold">{selectedDream.title}</h3>
-                    <button
-                      onClick={() => toggleBookmark(selectedDream.id)}
-                      className="p-2 rounded-full hover:bg-white/10 transition-colors"
-                    >
-                      <Heart className={`w-6 h-6 ${selectedDream.isBookmarked ? 'text-red-400 fill-current' : 'text-white/60'}`} />
-                    </button>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-purple-300">{selectedDream.date}</span>
-                    <div className="flex items-center space-x-2">
-                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                      <span className="text-yellow-300 font-medium">{selectedDream.confidence}% Confidence</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Interpretation */}
-                <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-xl">
-                  <h3 className="text-xl font-semibold mb-4 flex items-center">
-                    <Sparkles className="w-6 h-6 mr-2 text-yellow-300" />
-                    Interpretation
-                  </h3>
-                  <p className="text-white/90 leading-relaxed text-lg">{selectedDream.interpretation}</p>
-                </div>
-
-                {/* Themes & Mood */}
-                <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-xl">
-                  <h3 className="text-lg font-semibold mb-4">Spiritual Themes</h3>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {selectedDream.themes.map((theme, index) => (
-                      <span key={index} className="bg-purple-500/20 text-purple-200 px-3 py-2 rounded-full text-sm font-medium border border-purple-400/30">
-                        {theme}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-white/70">Mood:</span>
-                    <span className="text-purple-300 font-medium">{selectedDream.mood}</span>
-                  </div>
-                </div>
-
-                {/* Biblical References */}
-                <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-xl">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <BookOpen className="w-5 h-5 mr-2 text-blue-300" />
-                    Biblical References
-                  </h3>
-                  <div className="space-y-4">
-                    {selectedDream.biblicalRefs.map((ref, index) => (
-                      <div key={index} className="bg-blue-500/10 rounded-2xl p-4 border border-blue-400/20">
-                        <h4 className="font-semibold text-blue-300 mb-2">{ref.verse}</h4>
-                        <p className="text-blue-200 text-sm mb-3 italic">"{ref.text}"</p>
-                        <p className="text-white/80 text-sm">{ref.relevance}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Symbols */}
-                <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-xl">
-                  <h3 className="text-lg font-semibold mb-4">Key Symbols</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedDream.symbols.map((symbol, index) => (
-                      <span key={index} className="bg-green-500/20 text-green-200 px-3 py-2 rounded-full text-sm border border-green-400/30">
-                        {symbol}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              <button onClick={() => setCurrentScreen('auth')} className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 rounded-xl transition-all duration-200">Start recording your first dream</button>
+            )}
+            {onboardingStep > 0 && (
+              <button onClick={() => setOnboardingStep(onboardingStep - 1)} className="w-full text-gray-400 hover:text-white transition-colors">Back</button>
             )}
           </div>
         </div>
@@ -1134,107 +451,91 @@ export default function DreamScrollPWA() {
     );
   }
 
-  // Home Screen
+  // AUTH SCREEN
+  if (currentScreen === 'auth') {
+    return (
+      <div className="max-w-sm mx-auto bg-gray-900 min-h-screen">
+        <div className="min-h-screen flex flex-col justify-center p-6">
+          <div className="text-center mb-8">
+            <DreamScrollLogo size={80} className="mx-auto mb-6" />
+            <h1 className="text-3xl font-bold text-white mb-2">Welcome to DreamScroll</h1>
+            <p className="text-gray-400">Sign in to access your personal dream journal</p>
+          </div>
+          <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl p-6 border border-gray-700/50 mb-6">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                <input type="email" className="w-full p-4 rounded-xl bg-gray-700/50 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors" placeholder="your@email.com" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                <input type="password" className="w-full p-4 rounded-xl bg-gray-700/50 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors" placeholder="••••••••" />
+              </div>
+              <button onClick={() => { setIsAuthenticated(true); setCurrentScreen('home'); }} className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 rounded-xl transition-all duration-200">Sign In</button>
+              <div className="text-center">
+                <button className="text-blue-400 hover:text-blue-300 transition-colors text-sm">Don't have an account? Sign up</button>
+              </div>
+            </div>
+          </div>
+          <button onClick={() => { setIsAuthenticated(false); setCurrentScreen('home'); }} className="w-full text-center text-gray-400 hover:text-white transition-colors">Continue as Guest</button>
+        </div>
+      </div>
+    );
+  }
+
+  // HOME SCREEN
   if (currentScreen === 'home') {
     return (
-      <div className="max-w-sm mx-auto bg-gradient-to-br from-slate-900 to-purple-900 min-h-screen">
-        <PWAInstallBanner />
-        <OfflineIndicator />
-        <div className="min-h-screen text-white">
-          <div className="p-6 pb-24">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-8">
+      <div className="max-w-sm mx-auto bg-gray-900 min-h-screen">
+        <div className="min-h-screen">
+          <div className="bg-gray-800/50 backdrop-blur-xl border-b border-gray-700/50 p-6">
+            <div className="flex items-center justify-between">
               <div>
-                <div className="flex items-center space-x-3 mb-2">
-                  <DreamScrollLogo size={32} />
-                  <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-200 to-pink-200 bg-clip-text text-transparent">
-                    DreamScroll
-                  </h1>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <p className="text-purple-300">Good evening, {isAuthenticated ? 'Dreamer' : 'Guest'}</p>
-                  <div className="flex items-center space-x-1">
-                    {isOnline ? <Wifi className="w-4 h-4 text-green-400" /> : <WifiOff className="w-4 h-4 text-orange-400" />}
-                    {isInstalled && <Download className="w-4 h-4 text-blue-400" />}
-                  </div>
-                </div>
+                <h1 className="text-2xl font-bold text-white">DreamScroll</h1>
+                <p className="text-gray-400">Good evening, {isAuthenticated ? 'Sophia' : 'Guest'}</p>
               </div>
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => setCurrentScreen('search')}
-                  className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
-                >
-                  <Search className="w-5 h-5" />
+              <div className="flex items-center space-x-3">
+                <button onClick={() => setCurrentScreen('search')} className="w-10 h-10 bg-gray-700/50 rounded-xl flex items-center justify-center hover:bg-gray-600/50 transition-colors">
+                  <Search className="w-5 h-5 text-gray-300" />
                 </button>
-                <button
-                  onClick={() => setCurrentScreen('profile')}
-                  className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center"
-                >
-                  <User className="w-5 h-5" />
+                <button onClick={() => setCurrentScreen('profile')} className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
+                  <User className="w-5 h-5 text-white" />
                 </button>
               </div>
             </div>
-
-            {/* Quick Record Card */}
-            <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 mb-6 border border-white/20 shadow-xl">
+          </div>
+          <div className="p-6 pb-24 space-y-6">
+            <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl p-6 border border-gray-700/50">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold">Quick Record</h2>
+                <h2 className="text-xl font-bold text-white">Quick Record</h2>
                 <div className="flex items-center space-x-2">
-                  <DreamScrollLogo size={20} />
                   {audioSupported && <Mic className="w-4 h-4 text-green-400" />}
                   {!isOnline && <span className="text-xs bg-orange-500/20 text-orange-300 px-2 py-1 rounded-full">Offline</span>}
                 </div>
               </div>
-              <p className="text-white/70 mb-4">
-                Record your dream with voice or type it manually
-              </p>
-              <button
-                onClick={() => setCurrentScreen('input')}
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 py-4 rounded-2xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all transform hover:scale-105 shadow-lg"
-              >
-                🎤 Start Recording
-              </button>
+              <p className="text-gray-400 mb-4">Record your dream with voice or type it manually</p>
+              <button onClick={() => setCurrentScreen('input')} className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 rounded-xl transition-all duration-200">🎤 Start Recording</button>
             </div>
-
-            {/* Recent Dreams */}
-            <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 mb-6 border border-white/20 shadow-xl">
+            <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl p-6 border border-gray-700/50">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold flex items-center">
-                  <Sparkles className="w-5 h-5 mr-2 text-yellow-300" />
-                  Recent Dreams
-                </h3>
-                <button
-                  onClick={() => setCurrentScreen('journal')}
-                  className="text-purple-300 hover:text-white transition-colors text-sm"
-                >
-                  View All
-                </button>
+                <h3 className="text-lg font-semibold text-white">Recent Dreams</h3>
+                <button onClick={() => setCurrentScreen('journal')} className="text-blue-400 hover:text-blue-300 transition-colors text-sm">View All</button>
               </div>
-              
               <div className="space-y-3">
                 {dreams.slice(0, 2).map((dream) => (
-                  <div
-                    key={dream.id}
-                    onClick={() => {
-                      setSelectedDream(dream);
-                      setCurrentScreen('interpretation');
-                    }}
-                    className="bg-white/5 rounded-2xl p-4 cursor-pointer hover:bg-white/10 transition-all group"
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <h4 className="font-medium group-hover:text-purple-200 transition-colors">{dream.title}</h4>
+                  <div key={dream.id} onClick={() => { setSelectedDream(dream); setCurrentScreen('interpretation'); }} className="bg-gray-700/30 rounded-xl p-4 cursor-pointer hover:bg-gray-700/50 transition-all group">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-medium text-white group-hover:text-blue-300 transition-colors">{dream.title}</h4>
                       <div className="flex items-center space-x-2">
                         {dream.isBookmarked && <Heart className="w-4 h-4 text-red-400 fill-current" />}
-                        <span className="text-xs text-purple-300">{dream.date}</span>
+                        <span className="text-xs text-gray-400">{dream.date}</span>
                       </div>
                     </div>
-                    <p className="text-sm text-white/70 mb-3">{dream.content.substring(0, 80)}...</p>
+                    <p className="text-sm text-gray-400 mb-2">{dream.content.substring(0, 80)}...</p>
                     <div className="flex items-center justify-between">
-                      <div className="flex flex-wrap gap-1">
+                      <div className="flex space-x-2">
                         {dream.themes.slice(0, 2).map((theme, index) => (
-                          <span key={index} className="text-xs bg-purple-500/20 text-purple-200 px-2 py-1 rounded-full">
-                            {theme}
-                          </span>
+                          <span key={index} className="text-xs bg-blue-500/20 text-blue-300 px-2 py-1 rounded-full">{theme}</span>
                         ))}
                       </div>
                       <div className="flex items-center space-x-1">
@@ -1246,134 +547,372 @@ export default function DreamScrollPWA() {
                 ))}
               </div>
             </div>
-
-            {/* Stats Card */}
-            <div className="grid grid-cols-3 gap-3 mb-6">
-              <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 text-center border border-white/20">
-                <div className="text-2xl font-bold text-green-300">{dreams.length}</div>
-                <div className="text-xs text-white/70">Dreams</div>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="bg-gray-800/50 backdrop-blur-xl rounded-xl p-4 text-center border border-gray-700/50">
+                <div className="text-2xl font-bold text-white">{dreams.length}</div>
+                <div className="text-xs text-gray-400">Dreams</div>
               </div>
-              <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 text-center border border-white/20">
-                <div className="text-2xl font-bold text-blue-300">{dreams.filter(d => d.isBookmarked).length}</div>
-                <div className="text-xs text-white/70">Bookmarked</div>
+              <div className="bg-gray-800/50 backdrop-blur-xl rounded-xl p-4 text-center border border-gray-700/50">
+                <div className="text-2xl font-bold text-blue-400">{dreams.filter(d => d.isBookmarked).length}</div>
+                <div className="text-xs text-gray-400">Saved</div>
               </div>
-              <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 text-center border border-white/20">
-                <div className="text-2xl font-bold text-purple-300">7</div>
-                <div className="text-xs text-white/70">Day Streak</div>
+              <div className="bg-gray-800/50 backdrop-blur-xl rounded-xl p-4 text-center border border-gray-700/50">
+                <div className="text-2xl font-bold text-green-400">7</div>
+                <div className="text-xs text-gray-400">Day Streak</div>
               </div>
             </div>
-
-            {/* PWA Install Prompt */}
-            {installPrompt && !isInstalled && (
-              <div className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 backdrop-blur-xl rounded-3xl p-6 border border-purple-500/30 shadow-xl">
-                <h3 className="text-lg font-semibold mb-2 flex items-center">
-                  <Download className="w-5 h-5 mr-2 text-purple-300" />
-                  Install DreamScroll
-                </h3>
-                <p className="text-white/70 mb-4 text-sm">
-                  Add DreamScroll to your home screen for faster access and offline functionality.
-                </p>
-                <button
-                  onClick={handleInstallPWA}
-                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 py-3 rounded-2xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all"
-                >
-                  📱 Install as App
-                </button>
-              </div>
-            )}
           </div>
+          <BottomNav activeScreen="home" />
+        </div>
+      </div>
+    );
+  }
 
-          {/* Enhanced Bottom Navigation */}
-          <div className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-xl border-t border-white/10">
-            <div className="flex items-center justify-around py-3 px-6 max-w-sm mx-auto">
-              <button
-                onClick={() => setCurrentScreen('home')}
-                className="flex flex-col items-center space-y-1 text-purple-400"
-              >
-                <DreamScrollLogo size={20} />
-                <span className="text-xs">Home</span>
+// INPUT SCREEN
+  if (currentScreen === 'input') {
+    return (
+      <div className="max-w-sm mx-auto bg-gray-900 min-h-screen">
+        <div className="min-h-screen">
+          <div className="bg-gray-800/50 backdrop-blur-xl border-b border-gray-700/50 p-6">
+            <div className="flex items-center justify-between">
+              <button onClick={() => setCurrentScreen('home')} className="w-10 h-10 bg-gray-700/50 rounded-xl flex items-center justify-center hover:bg-gray-600/50 transition-colors">
+                <ArrowLeft className="w-5 h-5 text-gray-300" />
               </button>
-              
-              <button
-                onClick={() => setCurrentScreen('input')}
-                className="flex flex-col items-center space-y-1 text-white/60 hover:text-white transition-colors"
-              >
-                <Plus className="w-6 h-6" />
-                <span className="text-xs">Record</span>
+              <h2 className="text-xl font-bold text-white">Record Dream</h2>
+              <div className="w-10 h-10"></div>
+            </div>
+          </div>
+          <div className="p-6 pb-24 space-y-6">
+            <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl p-6 border border-gray-700/50">
+              <h3 className="text-lg font-semibold text-white mb-6">Describe Your Dream</h3>
+              <div className="text-center mb-6">
+                <div className="relative inline-block">
+                  <button
+                    onClick={isRecording ? stopRealRecording : startRealRecording}
+                    disabled={!audioSupported}
+                    className={`w-20 h-20 rounded-full flex items-center justify-center transition-all shadow-xl relative ${
+                      isRecording 
+                        ? 'bg-red-500 animate-pulse scale-110' 
+                        : audioSupported
+                        ? 'bg-blue-500 hover:bg-blue-600 hover:scale-105'
+                        : 'bg-gray-600 cursor-not-allowed'
+                    }`}
+                  >
+                    {isRecording ? <MicOff className="w-8 h-8 text-white" /> : <Mic className="w-8 h-8 text-white" />}
+                    {isRecording && (
+                      <div className="absolute inset-0 rounded-full border-4 border-white/30 animate-ping"></div>
+                    )}
+                  </button>
+                </div>
+                <div className="mt-4">
+                  <p className="text-gray-300 mb-2 font-medium">
+                    {isRecording 
+                      ? `🎤 ${isListening ? 'Listening' : 'Recording'}... ${formatTime(recordingTimer)}` 
+                      : audioSupported 
+                      ? 'Tap the microphone to start voice recording'
+                      : 'Voice recording not available - please type your dream below'
+                    }
+                  </p>
+                  {isRecording && isListening && (
+                    <div className="bg-green-500/20 rounded-xl p-3 border border-green-500/30">
+                      <p className="text-green-300 text-sm font-medium">🗣️ Speak now - your words will appear below</p>
+                    </div>
+                  )}
+                  {!audioSupported && (
+                    <div className="bg-orange-500/20 rounded-xl p-3 border border-orange-500/30">
+                      <p className="text-orange-300 text-sm">💡 Voice recording requires Chrome, Firefox, or Safari</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="relative">
+                <textarea
+                  value={dreamText}
+                  onChange={(e) => setDreamText(e.target.value)}
+                  placeholder="Type your dream here or use voice recording above..."
+                  disabled={isRecording}
+                  rows={6}
+                  className="w-full p-4 rounded-xl bg-gray-700/50 border border-gray-600 text-white placeholder-gray-400 resize-none focus:outline-none focus:border-blue-500 transition-colors"
+                />
+                {dreamText.trim() && !isProcessing && !isRecording && (
+                  <button
+                    onClick={() => {
+                      const textToProcess = dreamText;
+                      setDreamText('');
+                      generateAdvancedInterpretation(textToProcess);
+                    }}
+                    className="absolute bottom-4 right-4 bg-blue-500 hover:bg-blue-600 p-3 rounded-full transition-all shadow-lg hover:scale-105"
+                  >
+                    <Send className="w-5 h-5 text-white" />
+                  </button>
+                )}
+              </div>
+            </div>
+            <div className="bg-blue-500/10 rounded-xl p-4 border border-blue-500/20">
+              <h4 className="text-blue-300 font-medium mb-2">💡 Recording Tips</h4>
+              <ul className="text-blue-200 text-sm space-y-1">
+                <li>• Speak clearly and at a normal pace</li>
+                <li>• Include emotions and colors you remember</li>
+                <li>• Describe the setting and people involved</li>
+                <li>• Mention any symbols or unusual elements</li>
+              </ul>
+            </div>
+          </div>
+          <BottomNav activeScreen="input" />
+        </div>
+      </div>
+    );
+  }
+
+  // TRENDS SCREEN
+  if (currentScreen === 'trends') {
+    const emotionalData = getEmotionalToneData();
+    const frequencyData = getDreamFrequencyData();
+    const recurringSymbols = getRecurringSymbols();
+
+    return (
+      <div className="max-w-sm mx-auto bg-gray-900 min-h-screen">
+        <div className="min-h-screen">
+          <div className="bg-gray-800/50 backdrop-blur-xl border-b border-gray-700/50 p-6">
+            <div className="flex items-center justify-between">
+              <button onClick={() => setCurrentScreen('home')} className="w-10 h-10 bg-gray-700/50 rounded-xl flex items-center justify-center hover:bg-gray-600/50 transition-colors">
+                <ArrowLeft className="w-5 h-5 text-gray-300" />
               </button>
-              
-              <button
-                onClick={() => setCurrentScreen('journal')}
-                className="flex flex-col items-center space-y-1 text-white/60 hover:text-white transition-colors"
-              >
-                <Book className="w-6 h-6" />
-                <span className="text-xs">Journal</span>
+              <h2 className="text-xl font-bold text-white">Trend Analysis</h2>
+              <div className="w-10 h-10"></div>
+            </div>
+          </div>
+          <div className="p-6 pb-24 space-y-6">
+            <div className="flex space-x-2">
+              <button className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium">Frequency</button>
+              <button className="px-4 py-2 bg-gray-700/50 text-gray-400 rounded-lg text-sm font-medium">Themes</button>
+            </div>
+            <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl p-6 border border-gray-700/50">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-white">Dream Frequency</h3>
+                <div className="text-right">
+                  <div className="text-3xl font-bold text-white">{dreams.length}</div>
+                  <div className="text-sm text-green-400">Last 30 Days +10%</div>
+                </div>
+              </div>
+              <div className="h-32 flex items-end justify-between space-x-1">
+                {frequencyData.slice(-7).map((count, index) => (
+                  <div key={index} className="flex-1 flex flex-col items-center">
+                    <div 
+                      className="w-full bg-blue-500/30 rounded-t"
+                      style={{ 
+                        height: `${Math.max(8, (count / Math.max(...frequencyData)) * 100)}px`,
+                        backgroundColor: count > 0 ? '#3B82F6' : '#374151'
+                      }}
+                    ></div>
+                    <div className="text-xs text-gray-400 mt-2">
+                      {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][index]}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl p-6 border border-gray-700/50">
+              <h3 className="text-lg font-semibold text-white mb-4">Emotional Tone</h3>
+              <div className="text-2xl font-bold text-white mb-4">Positive</div>
+              <div className="text-sm text-green-400 mb-6">Last 30 Days +5%</div>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-300">Positive</span>
+                  <div className="flex-1 mx-4 bg-gray-700 rounded-full h-2">
+                    <div className="bg-green-500 h-2 rounded-full" style={{ width: `${emotionalData.positive}%` }}></div>
+                  </div>
+                  <span className="text-gray-300 text-sm">{emotionalData.positive}%</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-300">Neutral</span>
+                  <div className="flex-1 mx-4 bg-gray-700 rounded-full h-2">
+                    <div className="bg-yellow-500 h-2 rounded-full" style={{ width: `${emotionalData.neutral}%` }}></div>
+                  </div>
+                  <span className="text-gray-300 text-sm">{emotionalData.neutral}%</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-300">Negative</span>
+                  <div className="flex-1 mx-4 bg-gray-700 rounded-full h-2">
+                    <div className="bg-red-500 h-2 rounded-full" style={{ width: `${emotionalData.negative}%` }}></div>
+                  </div>
+                  <span className="text-gray-300 text-sm">{emotionalData.negative}%</span>
+                </div>
+              </div>
+            </div>
+            <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl p-6 border border-gray-700/50">
+              <h3 className="text-lg font-semibold text-white mb-4">Recurring Symbols</h3>
+              <div className="grid grid-cols-2 gap-3">
+                {recurringSymbols.map((item, index) => (
+                  <div key={index} className="bg-gray-700/30 rounded-xl p-3 text-center">
+                    <div className="text-2xl mb-1">
+                      {item.symbol === 'Forest' && '🌲'}
+                      {item.symbol === 'Flying' && '🕊️'}
+                      {item.symbol === 'Golden Mountains' && '⛰️'}
+                      {item.symbol === 'Whispering' && '💬'}
+                      {item.symbol === 'Ancient Trees' && '🌳'}
+                      {item.symbol === 'Luminous Flower' && '🌸'}
+                    </div>
+                    <div className="text-sm font-medium text-white">{item.symbol}</div>
+                    <div className="text-xs text-gray-400">{item.count}x</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <BottomNav activeScreen="trends" />
+        </div>
+      </div>
+    );
+  }
+
+  // INTERPRETATION SCREEN
+  if (currentScreen === 'interpretation') {
+    if (!selectedDream) {
+      return <div className="max-w-sm mx-auto bg-gray-900 min-h-screen flex items-center justify-center text-white">Loading...</div>;
+    }
+    
+    return (
+      <div className="max-w-sm mx-auto bg-gray-900 min-h-screen">
+        <div className="min-h-screen">
+          <div className="bg-gray-800/50 backdrop-blur-xl border-b border-gray-700/50 p-6">
+            <div className="flex items-center justify-between">
+              <button onClick={() => setCurrentScreen('home')} className="w-10 h-10 bg-gray-700/50 rounded-xl flex items-center justify-center hover:bg-gray-600/50 transition-colors">
+                <ArrowLeft className="w-5 h-5 text-gray-300" />
               </button>
-              
-              <button
-                onClick={() => setCurrentScreen('search')}
-                className="flex flex-col items-center space-y-1 text-white/60 hover:text-white transition-colors"
-              >
-                <Search className="w-6 h-6" />
-                <span className="text-xs">Search</span>
-              </button>
-              
-              <button
-                onClick={() => setCurrentScreen('profile')}
-                className="flex flex-col items-center space-y-1 text-white/60 hover:text-white transition-colors"
-              >
-                <User className="w-6 h-6" />
-                <span className="text-xs">Profile</span>
+              <h2 className="text-xl font-bold text-white">Dream Analysis</h2>
+              <button className="w-10 h-10 bg-gray-700/50 rounded-xl flex items-center justify-center hover:bg-gray-600/50 transition-colors">
+                <Share2 className="w-5 h-5 text-gray-300" />
               </button>
             </div>
+          </div>
+          <div className="p-6 pb-24 space-y-6">
+            {isProcessing ? (
+              <div className="flex flex-col items-center justify-center py-20">
+                <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mb-6 animate-pulse">
+                  <Brain className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-4">Analyzing Your Dream</h3>
+                <p className="text-gray-400 text-center max-w-sm">Our AI is interpreting the biblical symbolism and spiritual meaning...</p>
+              </div>
+            ) : (
+              <>
+                <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl p-6 border border-gray-700/50">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-white mb-2">{selectedDream.title}</h3>
+                      <p className="text-gray-400 text-sm">{selectedDream.date}</p>
+                    </div>
+                    <button
+                      onClick={() => toggleBookmark(selectedDream.id)}
+                      className="p-2 rounded-xl hover:bg-gray-700/50 transition-colors"
+                    >
+                      <Heart className={`w-6 h-6 ${selectedDream.isBookmarked ? 'text-red-400 fill-current' : 'text-gray-400'}`} />
+                    </button>
+                  </div>
+                  <div className="bg-gray-700/30 rounded-xl p-4 mb-4">
+                    <p className="text-gray-300 leading-relaxed">{selectedDream.content}</p>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                      <span className="text-yellow-300 text-sm font-medium">{selectedDream.confidence}% Confidence</span>
+                    </div>
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      selectedDream.emotionalTone === 'Positive' ? 'bg-green-500/20 text-green-300' :
+                      selectedDream.emotionalTone === 'Negative' ? 'bg-red-500/20 text-red-300' :
+                      'bg-yellow-500/20 text-yellow-300'
+                    }`}>
+                      {selectedDream.emotionalTone}
+                    </span>
+                  </div>
+                </div>
+                <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl p-6 border border-gray-700/50">
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                    <Sparkles className="w-5 h-5 mr-2 text-blue-400" />
+                    Interpretation
+                  </h3>
+                  <p className="text-gray-300 leading-relaxed">{selectedDream.interpretation}</p>
+                </div>
+                <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl p-6 border border-gray-700/50">
+                  <h3 className="text-lg font-semibold text-white mb-4">Spiritual Themes</h3>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {selectedDream.themes.map((theme, index) => (
+                      <span key={index} className="bg-blue-500/20 text-blue-300 px-3 py-2 rounded-full text-sm font-medium border border-blue-500/30">
+                        {theme}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-400">Mood:</span>
+                    <span className="text-blue-300 font-medium">{selectedDream.mood}</span>
+                  </div>
+                </div>
+                <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl p-6 border border-gray-700/50">
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                    <BookOpen className="w-5 h-5 mr-2 text-blue-400" />
+                    Biblical References
+                  </h3>
+                  <div className="space-y-4">
+                    {selectedDream.biblicalRefs.map((ref, index) => (
+                      <div key={index} className="bg-gray-700/30 rounded-xl p-4">
+                        <h4 className="font-semibold text-blue-300 mb-2">{ref.verse}</h4>
+                        <p className="text-gray-300 text-sm mb-3 italic">"{ref.text}"</p>
+                        <p className="text-gray-400 text-sm">{ref.relevance}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl p-6 border border-gray-700/50">
+                  <h3 className="text-lg font-semibold text-white mb-4">Key Symbols</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedDream.symbols.map((symbol, index) => (
+                      <span key={index} className="bg-green-500/20 text-green-300 px-3 py-2 rounded-full text-sm border border-green-500/30">
+                        {symbol}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
     );
   }
 
-  // Journal Screen
+// JOURNAL SCREEN
   if (currentScreen === 'journal') {
     return (
-      <div className="max-w-sm mx-auto bg-gradient-to-br from-slate-900 to-purple-900 min-h-screen">
-        <OfflineIndicator />
-        <div className="min-h-screen text-white">
-          <div className="p-6 pb-24">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-8">
-              <button 
-                onClick={() => setCurrentScreen('home')}
-                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
+      <div className="max-w-sm mx-auto bg-gray-900 min-h-screen">
+        <div className="min-h-screen">
+          <div className="bg-gray-800/50 backdrop-blur-xl border-b border-gray-700/50 p-6">
+            <div className="flex items-center justify-between">
+              <button onClick={() => setCurrentScreen('home')} className="w-10 h-10 bg-gray-700/50 rounded-xl flex items-center justify-center hover:bg-gray-600/50 transition-colors">
+                <ArrowLeft className="w-5 h-5 text-gray-300" />
               </button>
-              <h2 className="text-2xl font-bold">Dream Journal</h2>
-              <button
-                onClick={() => setCurrentScreen('search')}
-                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
-              >
-                <Search className="w-5 h-5" />
+              <h2 className="text-xl font-bold text-white">Dream Journal</h2>
+              <button onClick={() => setCurrentScreen('search')} className="w-10 h-10 bg-gray-700/50 rounded-xl flex items-center justify-center hover:bg-gray-600/50 transition-colors">
+                <Search className="w-5 h-5 text-gray-300" />
               </button>
             </div>
-
-            {/* Filter Tabs */}
-            <div className="flex space-x-2 mb-6">
+          </div>
+          <div className="p-6 pb-24 space-y-6">
+            <div className="flex space-x-2">
               {['all', 'bookmarked', 'recent'].map((filter) => (
                 <button
                   key={filter}
                   onClick={() => setSelectedFilter(filter)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                     selectedFilter === filter
-                      ? 'bg-purple-500 text-white'
-                      : 'bg-white/10 text-white/70 hover:bg-white/20'
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-700/50 text-gray-400 hover:bg-gray-600/50'
                   }`}
                 >
                   {filter.charAt(0).toUpperCase() + filter.slice(1)}
                 </button>
               ))}
             </div>
-
-            {/* Dreams List */}
             <div className="space-y-4">
               {filteredDreams.map((dream) => (
                 <div
@@ -1382,30 +921,28 @@ export default function DreamScrollPWA() {
                     setSelectedDream(dream);
                     setCurrentScreen('interpretation');
                   }}
-                  className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-xl cursor-pointer hover:bg-white/15 transition-all group"
+                  className="bg-gray-800/50 backdrop-blur-xl rounded-2xl p-6 border border-gray-700/50 cursor-pointer hover:bg-gray-700/50 transition-all"
                 >
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-bold group-hover:text-purple-200 transition-colors">{dream.title}</h3>
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-lg font-bold text-white">{dream.title}</h3>
                     <div className="flex items-center space-x-2">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           toggleBookmark(dream.id);
                         }}
-                        className="p-1 rounded-full hover:bg-white/10 transition-colors"
+                        className="p-1 rounded-lg hover:bg-gray-600/50 transition-colors"
                       >
-                        <Heart className={`w-5 h-5 ${dream.isBookmarked ? 'text-red-400 fill-current' : 'text-white/60'}`} />
+                        <Heart className={`w-5 h-5 ${dream.isBookmarked ? 'text-red-400 fill-current' : 'text-gray-400'}`} />
                       </button>
-                      <span className="text-sm text-purple-300">{dream.date}</span>
+                      <span className="text-sm text-gray-400">{dream.date}</span>
                     </div>
                   </div>
-                  
-                  <p className="text-white/80 mb-4 line-clamp-3">{dream.content}</p>
-                  
+                  <p className="text-gray-300 mb-4 line-clamp-3">{dream.content}</p>
                   <div className="flex items-center justify-between">
                     <div className="flex flex-wrap gap-2">
                       {dream.themes.slice(0, 3).map((theme, index) => (
-                        <span key={index} className="text-xs bg-purple-500/20 text-purple-200 px-2 py-1 rounded-full">
+                        <span key={index} className="text-xs bg-blue-500/20 text-blue-300 px-2 py-1 rounded-full">
                           {theme}
                         </span>
                       ))}
@@ -1418,103 +955,48 @@ export default function DreamScrollPWA() {
                 </div>
               ))}
             </div>
-
             {filteredDreams.length === 0 && (
               <div className="text-center py-12">
-                <Moon className="w-16 h-16 text-white/30 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-white/70 mb-2">No dreams found</h3>
-                <p className="text-white/50 mb-6">Start recording your dreams to build your spiritual journal</p>
-                <button
-                  onClick={() => setCurrentScreen('input')}
-                  className="bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-3 rounded-2xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all"
-                >
+                <Moon className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-400 mb-2">No dreams found</h3>
+                <p className="text-gray-500 mb-6">Start recording your dreams to build your spiritual journal</p>
+                <button onClick={() => setCurrentScreen('input')} className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold transition-all">
                   Record First Dream
                 </button>
               </div>
             )}
           </div>
-
-          {/* Bottom Navigation */}
-          <div className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-xl border-t border-white/10">
-            <div className="flex items-center justify-around py-3 px-6 max-w-sm mx-auto">
-              <button
-                onClick={() => setCurrentScreen('home')}
-                className="flex flex-col items-center space-y-1 text-white/60 hover:text-white transition-colors"
-              >
-                <DreamScrollLogo size={20} />
-                <span className="text-xs">Home</span>
-              </button>
-              
-              <button
-                onClick={() => setCurrentScreen('input')}
-                className="flex flex-col items-center space-y-1 text-white/60 hover:text-white transition-colors"
-              >
-                <Plus className="w-6 h-6" />
-                <span className="text-xs">Record</span>
-              </button>
-              
-              <button
-                onClick={() => setCurrentScreen('journal')}
-                className="flex flex-col items-center space-y-1 text-purple-400"
-              >
-                <Book className="w-6 h-6" />
-                <span className="text-xs">Journal</span>
-              </button>
-              
-              <button
-                onClick={() => setCurrentScreen('search')}
-                className="flex flex-col items-center space-y-1 text-white/60 hover:text-white transition-colors"
-              >
-                <Search className="w-6 h-6" />
-                <span className="text-xs">Search</span>
-              </button>
-              
-              <button
-                onClick={() => setCurrentScreen('profile')}
-                className="flex flex-col items-center space-y-1 text-white/60 hover:text-white transition-colors"
-              >
-                <User className="w-6 h-6" />
-                <span className="text-xs">Profile</span>
-              </button>
-            </div>
-          </div>
+          <BottomNav activeScreen="journal" />
         </div>
       </div>
     );
   }
 
-  // Search Screen
+  // SEARCH SCREEN
   if (currentScreen === 'search') {
     return (
-      <div className="max-w-sm mx-auto bg-gradient-to-br from-slate-900 to-purple-900 min-h-screen">
-        <OfflineIndicator />
-        <div className="min-h-screen text-white">
-          <div className="p-6 pb-24">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-8">
-              <button 
-                onClick={() => setCurrentScreen('home')}
-                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
+      <div className="max-w-sm mx-auto bg-gray-900 min-h-screen">
+        <div className="min-h-screen">
+          <div className="bg-gray-800/50 backdrop-blur-xl border-b border-gray-700/50 p-6">
+            <div className="flex items-center justify-between">
+              <button onClick={() => setCurrentScreen('home')} className="w-10 h-10 bg-gray-700/50 rounded-xl flex items-center justify-center hover:bg-gray-600/50 transition-colors">
+                <ArrowLeft className="w-5 h-5 text-gray-300" />
               </button>
-              <h2 className="text-2xl font-bold">Search Dreams</h2>
+              <h2 className="text-xl font-bold text-white">Search Dreams</h2>
               <div className="w-10 h-10"></div>
             </div>
-
-            {/* Search Input */}
-            <div className="relative mb-6">
+          </div>
+          <div className="p-6 pb-24 space-y-6">
+            <div className="relative">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search dreams, themes, or symbols..."
-                className="w-full p-4 pl-12 rounded-2xl bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:border-purple-400 focus:bg-white/15 transition-all backdrop-blur-sm"
+                className="w-full p-4 pl-12 rounded-xl bg-gray-800/50 border border-gray-700 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
               />
-              <Search className="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-white/50" />
+              <Search className="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
             </div>
-
-            {/* Search Results */}
             <div className="space-y-4">
               {filteredDreams.map((dream) => (
                 <div
@@ -1523,18 +1005,16 @@ export default function DreamScrollPWA() {
                     setSelectedDream(dream);
                     setCurrentScreen('interpretation');
                   }}
-                  className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-xl cursor-pointer hover:bg-white/15 transition-all"
+                  className="bg-gray-800/50 backdrop-blur-xl rounded-2xl p-6 border border-gray-700/50 cursor-pointer hover:bg-gray-700/50 transition-all"
                 >
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-lg font-bold">{dream.title}</h3>
-                    <span className="text-sm text-purple-300">{dream.date}</span>
+                    <h3 className="text-lg font-bold text-white">{dream.title}</h3>
+                    <span className="text-sm text-gray-400">{dream.date}</span>
                   </div>
-                  
-                  <p className="text-white/80 mb-3 line-clamp-2">{dream.content}</p>
-                  
+                  <p className="text-gray-300 mb-3 line-clamp-2">{dream.content}</p>
                   <div className="flex flex-wrap gap-2">
                     {dream.themes.slice(0, 3).map((theme, index) => (
-                      <span key={index} className="text-xs bg-purple-500/20 text-purple-200 px-2 py-1 rounded-full">
+                      <span key={index} className="text-xs bg-blue-500/20 text-blue-300 px-2 py-1 rounded-full">
                         {theme}
                       </span>
                     ))}
@@ -1542,237 +1022,239 @@ export default function DreamScrollPWA() {
                 </div>
               ))}
             </div>
-
             {searchQuery && filteredDreams.length === 0 && (
               <div className="text-center py-12">
-                <Search className="w-16 h-16 text-white/30 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-white/70 mb-2">No results found</h3>
-                <p className="text-white/50">Try searching for different keywords or themes</p>
+                <Search className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-400 mb-2">No results found</h3>
+                <p className="text-gray-500">Try searching for different keywords or themes</p>
               </div>
             )}
-
             {!searchQuery && (
               <div className="text-center py-12">
-                <Search className="w-16 h-16 text-white/30 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-white/70 mb-2">Search Your Dreams</h3>
-                <p className="text-white/50">Find dreams by title, content, themes, or symbols</p>
+                <Search className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-400 mb-2">Search Your Dreams</h3>
+                <p className="text-gray-500">Find dreams by title, content, themes, or symbols</p>
               </div>
             )}
           </div>
-
-          {/* Bottom Navigation */}
-          <div className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-xl border-t border-white/10">
-            <div className="flex items-center justify-around py-3 px-6 max-w-sm mx-auto">
-              <button
-                onClick={() => setCurrentScreen('home')}
-                className="flex flex-col items-center space-y-1 text-white/60 hover:text-white transition-colors"
-              >
-                <DreamScrollLogo size={20} />
-                <span className="text-xs">Home</span>
-              </button>
-              
-              <button
-                onClick={() => setCurrentScreen('input')}
-                className="flex flex-col items-center space-y-1 text-white/60 hover:text-white transition-colors"
-              >
-                <Plus className="w-6 h-6" />
-                <span className="text-xs">Record</span>
-              </button>
-              
-              <button
-                onClick={() => setCurrentScreen('journal')}
-                className="flex flex-col items-center space-y-1 text-white/60 hover:text-white transition-colors"
-              >
-                <Book className="w-6 h-6" />
-                <span className="text-xs">Journal</span>
-              </button>
-              
-              <button
-                onClick={() => setCurrentScreen('search')}
-                className="flex flex-col items-center space-y-1 text-purple-400"
-              >
-                <Search className="w-6 h-6" />
-                <span className="text-xs">Search</span>
-              </button>
-              
-              <button
-                onClick={() => setCurrentScreen('profile')}
-                className="flex flex-col items-center space-y-1 text-white/60 hover:text-white transition-colors"
-              >
-                <User className="w-6 h-6" />
-                <span className="text-xs">Profile</span>
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     );
   }
 
-  // Profile Screen
+  // PROFILE SCREEN
   if (currentScreen === 'profile') {
     return (
-      <div className="max-w-sm mx-auto bg-gradient-to-br from-slate-900 to-purple-900 min-h-screen">
-        <OfflineIndicator />
-        <div className="min-h-screen text-white">
-          <div className="p-6 pb-24">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-8">
-              <button 
-                onClick={() => setCurrentScreen('home')}
-                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
+      <div className="max-w-sm mx-auto bg-gray-900 min-h-screen">
+        <div className="min-h-screen">
+          <div className="bg-gray-800/50 backdrop-blur-xl border-b border-gray-700/50 p-6">
+            <div className="flex items-center justify-between">
+              <button onClick={() => setCurrentScreen('home')} className="w-10 h-10 bg-gray-700/50 rounded-xl flex items-center justify-center hover:bg-gray-600/50 transition-colors">
+                <ArrowLeft className="w-5 h-5 text-gray-300" />
               </button>
-              <h2 className="text-2xl font-bold">Profile</h2>
-              <button className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
-                <Settings className="w-5 h-5" />
+              <h2 className="text-xl font-bold text-white">Settings</h2>
+              <button onClick={() => setCurrentScreen('settings')} className="w-10 h-10 bg-gray-700/50 rounded-xl flex items-center justify-center hover:bg-gray-600/50 transition-colors">
+                <Settings className="w-5 h-5 text-gray-300" />
               </button>
-            </div>
-
-            {/* Profile Card */}
-            <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 mb-6 border border-white/20 shadow-xl text-center">
-              <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <User className="w-10 h-10" />
-              </div>
-              <h3 className="text-xl font-bold mb-2">{isAuthenticated ? 'Dreamer' : 'Guest User'}</h3>
-              <p className="text-purple-300 mb-4">Spiritual Seeker</p>
-              <div className="flex justify-center space-x-4 text-sm">
-                <div className="text-center">
-                  <div className="text-lg font-bold text-green-400">{dreams.length}</div>
-                  <div className="text-white/70">Dreams</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-lg font-bold text-blue-400">{dreams.filter(d => d.isBookmarked).length}</div>
-                  <div className="text-white/70">Saved</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-lg font-bold text-purple-400">7</div>
-                  <div className="text-white/70">Day Streak</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Settings Options */}
-            <div className="space-y-3">
-              <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 border border-white/20">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <BookOpen className="w-5 h-5 text-blue-400" />
-                    <span>Export Dreams</span>
-                  </div>
-                  <button className="text-purple-400 hover:text-white transition-colors">
-                    →
-                  </button>
-                </div>
-              </div>
-
-              <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 border border-white/20">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <Download className="w-5 h-5 text-green-400" />
-                    <span>Backup & Sync</span>
-                  </div>
-                  <button className="text-purple-400 hover:text-white transition-colors">
-                    →
-                  </button>
-                </div>
-              </div>
-
-              <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 border border-white/20">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <Settings className="w-5 h-5 text-purple-400" />
-                    <span>App Settings</span>
-                  </div>
-                  <button className="text-purple-400 hover:text-white transition-colors">
-                    →
-                  </button>
-                </div>
-              </div>
-
-              {!isAuthenticated && (
-                <button
-                  onClick={() => setCurrentScreen('auth')}
-                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 py-4 rounded-2xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all"
-                >
-                  Sign In / Sign Up
-                </button>
-              )}
-
-              {isAuthenticated && (
-                <button
-                  onClick={() => {
-                    setIsAuthenticated(false);
-                    setCurrentScreen('home');
-                  }}
-                  className="w-full bg-red-500/20 border border-red-400/30 py-4 rounded-2xl font-semibold text-red-300 hover:bg-red-500/30 transition-all"
-                >
-                  Sign Out
-                </button>
-              )}
-            </div>
-
-            {/* App Info */}
-            <div className="bg-white/5 rounded-2xl p-4 mt-6 text-center">
-              <DreamScrollLogo size={32} className="mx-auto mb-2" />
-              <p className="text-white/50 text-sm">DreamScroll v1.0.0</p>
-              <p className="text-white/40 text-xs">Biblical dream interpretation</p>
             </div>
           </div>
-
-          {/* Bottom Navigation */}
-          <div className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-xl border-t border-white/10">
-            <div className="flex items-center justify-around py-3 px-6 max-w-sm mx-auto">
-              <button
-                onClick={() => setCurrentScreen('home')}
-                className="flex flex-col items-center space-y-1 text-white/60 hover:text-white transition-colors"
-              >
-                <DreamScrollLogo size={20} />
-                <span className="text-xs">Home</span>
-              </button>
-              
-              <button
-                onClick={() => setCurrentScreen('input')}
-                className="flex flex-col items-center space-y-1 text-white/60 hover:text-white transition-colors"
-              >
-                <Plus className="w-6 h-6" />
-                <span className="text-xs">Record</span>
-              </button>
-              
-              <button
-                onClick={() => setCurrentScreen('journal')}
-                className="flex flex-col items-center space-y-1 text-white/60 hover:text-white transition-colors"
-              >
-                <Book className="w-6 h-6" />
-                <span className="text-xs">Journal</span>
-              </button>
-              
-              <button
-                onClick={() => setCurrentScreen('search')}
-                className="flex flex-col items-center space-y-1 text-white/60 hover:text-white transition-colors"
-              >
-                <Search className="w-6 h-6" />
-                <span className="text-xs">Search</span>
-              </button>
-              
-              <button
-                onClick={() => setCurrentScreen('profile')}
-                className="flex flex-col items-center space-y-1 text-purple-400"
-              >
-                <User className="w-6 h-6" />
-                <span className="text-xs">Profile</span>
-              </button>
+          <div className="p-6 pb-24 space-y-6">
+            <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl p-6 border border-gray-700/50 text-center">
+              <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <User className="w-10 h-10 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-1">{isAuthenticated ? 'Sophia Carter' : 'Guest User'}</h3>
+              <p className="text-blue-400 mb-1">Premium</p>
+              <p className="text-gray-400 text-sm">Joined 2022</p>
             </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="bg-gray-800/50 backdrop-blur-xl rounded-xl p-4 text-center border border-gray-700/50">
+                <div className="text-2xl font-bold text-white">{dreams.length}</div>
+                <div className="text-xs text-gray-400">Dreams</div>
+              </div>
+              <div className="bg-gray-800/50 backdrop-blur-xl rounded-xl p-4 text-center border border-gray-700/50">
+                <div className="text-2xl font-bold text-blue-400">{dreams.filter(d => d.isBookmarked).length}</div>
+                <div className="text-xs text-gray-400">Saved</div>
+              </div>
+              <div className="bg-gray-800/50 backdrop-blur-xl rounded-xl p-4 text-center border border-gray-700/50">
+                <div className="text-2xl font-bold text-green-400">7</div>
+                <div className="text-xs text-gray-400">Day Streak</div>
+              </div>
+            </div>
+            <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl p-6 border border-gray-700/50">
+              <h3 className="text-lg font-semibold text-white mb-4">Account</h3>
+              <div className="space-y-3">
+                <button className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-700/50 transition-colors">
+                  <div className="flex items-center space-x-3">
+                    <User className="w-5 h-5 text-gray-400" />
+                    <span className="text-white">Edit Profile</span>
+                  </div>
+                  <ArrowLeft className="w-4 h-4 text-gray-400 rotate-180" />
+                </button>
+                <button className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-700/50 transition-colors">
+                  <div className="flex items-center space-x-3">
+                    <Download className="w-5 h-5 text-gray-400" />
+                    <span className="text-white">Backup & Sync</span>
+                  </div>
+                  <ArrowLeft className="w-4 h-4 text-gray-400 rotate-180" />
+                </button>
+                <button className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-700/50 transition-colors">
+                  <div className="flex items-center space-x-3">
+                    <BookOpen className="w-5 h-5 text-gray-400" />
+                    <span className="text-white">Export Dreams</span>
+                  </div>
+                  <ArrowLeft className="w-4 h-4 text-gray-400 rotate-180" />
+                </button>
+              </div>
+            </div>
+            <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl p-6 border border-gray-700/50">
+              <h3 className="text-lg font-semibold text-white mb-4">Support</h3>
+              <div className="space-y-3">
+                <button className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-700/50 transition-colors">
+                  <div className="flex items-center space-x-3">
+                    <HelpCircle className="w-5 h-5 text-gray-400" />
+                    <span className="text-white">Help Center</span>
+                  </div>
+                  <ArrowLeft className="w-4 h-4 text-gray-400 rotate-180" />
+                </button>
+                <button className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-700/50 transition-colors">
+                  <div className="flex items-center space-x-3">
+                    <Mail className="w-5 h-5 text-gray-400" />
+                    <span className="text-white">Contact Us</span>
+                  </div>
+                  <ArrowLeft className="w-4 h-4 text-gray-400 rotate-180" />
+                </button>
+              </div>
+            </div>
+            {!isAuthenticated ? (
+              <button onClick={() => setCurrentScreen('auth')} className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 rounded-xl transition-all">
+                Sign In / Sign Up
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  setIsAuthenticated(false);
+                  setCurrentScreen('home');
+                }}
+                className="w-full bg-red-500/20 border border-red-500/30 text-red-400 font-semibold py-4 rounded-xl hover:bg-red-500/30 transition-all"
+              >
+                Sign Out
+              </button>
+            )}
+            <div className="text-center pt-4">
+              <DreamScrollLogo size={32} className="mx-auto mb-2" />
+              <p className="text-gray-500 text-sm">DreamScroll v1.0.0</p>
+              <p className="text-gray-600 text-xs">Biblical dream interpretation</p>
+            </div>
+          </div>
+          <BottomNav activeScreen="profile" />
+        </div>
+      </div>
+    );
+  }
+
+  // SETTINGS SCREEN
+  if (currentScreen === 'settings') {
+    return (
+      <div className="max-w-sm mx-auto bg-gray-900 min-h-screen">
+        <div className="min-h-screen">
+          <div className="bg-gray-800/50 backdrop-blur-xl border-b border-gray-700/50 p-6">
+            <div className="flex items-center justify-between">
+              <button onClick={() => setCurrentScreen('profile')} className="w-10 h-10 bg-gray-700/50 rounded-xl flex items-center justify-center hover:bg-gray-600/50 transition-colors">
+                <ArrowLeft className="w-5 h-5 text-gray-300" />
+              </button>
+              <h2 className="text-xl font-bold text-white">Settings</h2>
+              <div className="w-10 h-10"></div>
+            </div>
+          </div>
+          <div className="p-6 pb-24">
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-white mb-4">Account</h3>
+              <div className="space-y-3">
+                <button className="w-full bg-gray-800/50 rounded-xl p-4 flex items-center justify-between hover:bg-gray-700/50 transition-colors">
+                  <div className="flex items-center space-x-3">
+                    <User className="w-5 h-5 text-gray-400" />
+                    <span className="text-white">Edit Profile</span>
+                  </div>
+                  <ArrowLeft className="w-4 h-4 text-gray-400 rotate-180" />
+                </button>
+                <button className="w-full bg-gray-800/50 rounded-xl p-4 flex items-center justify-between hover:bg-gray-700/50 transition-colors">
+                  <div className="flex items-center space-x-3">
+                    <Shield className="w-5 h-5 text-gray-400" />
+                    <span className="text-white">Change Password</span>
+                  </div>
+                  <ArrowLeft className="w-4 h-4 text-gray-400 rotate-180" />
+                </button>
+                <button className="w-full bg-gray-800/50 rounded-xl p-4 flex items-center justify-between hover:bg-gray-700/50 transition-colors">
+                  <div className="flex items-center space-x-3">
+                    <Bell className="w-5 h-5 text-gray-400" />
+                    <span className="text-white">Notifications</span>
+                  </div>
+                  <ArrowLeft className="w-4 h-4 text-gray-400 rotate-180" />
+                </button>
+                <button className="w-full bg-gray-800/50 rounded-xl p-4 flex items-center justify-between hover:bg-gray-700/50 transition-colors">
+                  <div className="flex items-center space-x-3">
+                    <Globe className="w-5 h-5 text-gray-400" />
+                    <span className="text-white">Language</span>
+                  </div>
+                  <ArrowLeft className="w-4 h-4 text-gray-400 rotate-180" />
+                </button>
+              </div>
+            </div>
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-white mb-4">Support</h3>
+              <div className="space-y-3">
+                <button className="w-full bg-gray-800/50 rounded-xl p-4 flex items-center justify-between hover:bg-gray-700/50 transition-colors">
+                  <div className="flex items-center space-x-3">
+                    <HelpCircle className="w-5 h-5 text-gray-400" />
+                    <span className="text-white">Help Center</span>
+                  </div>
+                  <ArrowLeft className="w-4 h-4 text-gray-400 rotate-180" />
+                </button>
+                <button className="w-full bg-gray-800/50 rounded-xl p-4 flex items-center justify-between hover:bg-gray-700/50 transition-colors">
+                  <div className="flex items-center space-x-3">
+                    <Mail className="w-5 h-5 text-gray-400" />
+                    <span className="text-white">Contact Us</span>
+                  </div>
+                  <ArrowLeft className="w-4 h-4 text-gray-400 rotate-180" />
+                </button>
+                <button className="w-full bg-gray-800/50 rounded-xl p-4 flex items-center justify-between hover:bg-gray-700/50 transition-colors">
+                  <div className="flex items-center space-x-3">
+                    <FileText className="w-5 h-5 text-gray-400" />
+                    <span className="text-white">Terms of Service</span>
+                  </div>
+                  <ArrowLeft className="w-4 h-4 text-gray-400 rotate-180" />
+                </button>
+                <button className="w-full bg-gray-800/50 rounded-xl p-4 flex items-center justify-between hover:bg-gray-700/50 transition-colors">
+                  <div className="flex items-center space-x-3">
+                    <Shield className="w-5 h-5 text-gray-400" />
+                    <span className="text-white">Privacy Policy</span>
+                  </div>
+                  <ArrowLeft className="w-4 h-4 text-gray-400 rotate-180" />
+                </button>
+              </div>
+            </div>
+            {isAuthenticated && (
+              <button
+                onClick={() => {
+                  setIsAuthenticated(false);
+                  setCurrentScreen('home');
+                }}
+                className="w-full bg-red-500/20 border border-red-500/30 rounded-xl p-4 flex items-center justify-center hover:bg-red-500/30 transition-colors"
+              >
+                <LogOut className="w-5 h-5 text-red-400 mr-3" />
+                <span className="text-red-400 font-semibold">Sign Out</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
     );
   }
 
-  // Default fallback
+// DEFAULT FALLBACK
   return (
-    <div className="max-w-sm mx-auto bg-black min-h-screen flex items-center justify-center text-white">
+    <div className="max-w-sm mx-auto bg-gray-900 min-h-screen flex items-center justify-center text-white">
       <div className="text-center">
         <DreamScrollLogo size={64} className="mx-auto mb-4" />
         <p>Loading DreamScroll...</p>
