@@ -18,8 +18,42 @@ declare global {
   }
 }
 
+// Interface definitions
+interface BiblicalRef {
+  verse: string;
+  text: string;
+  relevance: string;
+}
+
+interface Dream {
+  id: number;
+  title: string;
+  content: string;
+  date: string;
+  timestamp: Date;
+  themes: string[];
+  symbols: string[];
+  interpretation: string;
+  biblicalRefs: BiblicalRef[];
+  emotionalTone: string;
+  mood: string;
+  confidence: number;
+  isBookmarked: boolean;
+  category: string;
+  tags: string[];
+  audioNotes: any;
+  lastViewed: Date;
+}
+
+interface Notification {
+  id: number;
+  message: string;
+  type: 'info' | 'success' | 'error';
+  timestamp: Date;
+}
+
 // Logo Component
-const DreamScrollLogo = ({ size = 40, className = "" }) => (
+const DreamScrollLogo = ({ size = 40, className = "" }: { size?: number; className?: string }) => (
   <div className={`relative ${className}`} style={{ width: size, height: size }}>
     <div 
       className="absolute inset-0 bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 rounded-full"
@@ -50,19 +84,19 @@ export default function DreamScrollApp() {
   const [audioSupported, setAudioSupported] = useState(false);
   
   // Navigation State
-  const [selectedDream, setSelectedDream] = useState(null);
-  const [selectedFilter, setSelectedFilter] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
-  const [sortBy, setSortBy] = useState('date');
+  const [selectedDream, setSelectedDream] = useState<Dream | null>(null);
+  const [selectedFilter, setSelectedFilter] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [showFilters, setShowFilters] = useState<boolean>(false);
+  const [sortBy, setSortBy] = useState<string>('date');
   
   // Enhanced UI State
-  const [showBiblicalRefs, setShowBiblicalRefs] = useState(true);
-  const [showSymbols, setShowSymbols] = useState(true);
-  const [textToSpeech, setTextToSpeech] = useState(false);
-  const [readingSpeed, setReadingSpeed] = useState(1);
-  const [notifications, setNotifications] = useState([]);
-  const [darkMode, setDarkMode] = useState(true);
+  const [showBiblicalRefs, setShowBiblicalRefs] = useState<boolean>(true);
+  const [showSymbols, setShowSymbols] = useState<boolean>(true);
+  const [textToSpeech, setTextToSpeech] = useState<boolean>(false);
+  const [readingSpeed, setReadingSpeed] = useState<number>(1);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [darkMode, setDarkMode] = useState<boolean>(true);
   
   // Refs
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -71,7 +105,7 @@ export default function DreamScrollApp() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Enhanced Sample Dreams Data
-  const [dreams, setDreams] = useState([
+  const [dreams, setDreams] = useState<Dream[]>([
     {
       id: 1,
       title: "Golden Mountain Vision",
@@ -223,7 +257,7 @@ export default function DreamScrollApp() {
   }, [isRecording]);
 
   // Format timer
-  const formatTime = (seconds) => {
+  const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
@@ -539,7 +573,7 @@ export default function DreamScrollApp() {
   );
 
   // Bottom Navigation Component
-  const BottomNav = ({ activeScreen }) => (
+  const BottomNav = ({ activeScreen }: { activeScreen: string }) => (
     <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-sm bg-gray-800/90 backdrop-blur-xl border-t border-gray-700/50">
       <div className="flex items-center justify-around py-2">
         {[
