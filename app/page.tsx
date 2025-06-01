@@ -10,6 +10,14 @@ import {
   Trash2, Edit3, Play, Pause, RefreshCw, Eye, EyeOff
 } from 'lucide-react';
 
+// Type declarations for browser APIs
+declare global {
+  interface Window {
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
+  }
+}
+
 // Logo Component
 const DreamScrollLogo = ({ size = 40, className = "" }) => (
   <div className={`relative ${className}`} style={{ width: size, height: size }}>
@@ -59,7 +67,7 @@ export default function DreamScrollApp() {
   // Refs
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<any>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Enhanced Sample Dreams Data
@@ -745,7 +753,11 @@ export default function DreamScrollApp() {
                           <span className="text-xs text-gray-400">{dream.date}</span>
                         </div>
                       </div>
-                      <p className="text-gray-300 text-xs line-clamp-2 mb-2">{dream.content}</p>
+                      <p className="text-gray-300 text-xs mb-2 overflow-hidden" style={{
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical'
+                      }}>{dream.content}</p>
                       <div className="flex items-center justify-between">
                         <div className="flex space-x-1">
                           {dream.themes.slice(0, 2).map((theme, index) => (
@@ -1059,7 +1071,12 @@ export default function DreamScrollApp() {
                       setSelectedDream(dream);
                       setCurrentScreen('interpretation');
                     }}
-                    className="text-gray-300 mb-4 line-clamp-3 cursor-pointer"
+                    className="text-gray-300 mb-4 cursor-pointer overflow-hidden"
+                    style={{
+                      display: '-webkit-box',
+                      WebkitLineClamp: 3,
+                      WebkitBoxOrient: 'vertical'
+                    }}
                   >
                     {dream.content}
                   </p>
@@ -1608,7 +1625,11 @@ export default function DreamScrollApp() {
                       <h4 className="font-semibold text-white">{dream.title}</h4>
                       <span className="text-xs text-gray-400">{dream.date}</span>
                     </div>
-                    <p className="text-gray-300 text-sm line-clamp-2 mb-2">{dream.content}</p>
+                    <p className="text-gray-300 text-sm mb-2 overflow-hidden" style={{
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical'
+                    }}>{dream.content}</p>
                     <div className="flex items-center justify-between">
                       <div className="flex space-x-1">
                         {dream.themes.slice(0, 2).map((theme, index) => (
