@@ -531,7 +531,7 @@ export default function DreamScrollApp() {
   };
 
   const getCategoryData = () => {
-    const categoryCount = {};
+    const categoryCount: { [key: string]: number } = {};
     dreams.forEach(dream => {
       categoryCount[dream.category] = (categoryCount[dream.category] || 0) + 1;
     });
@@ -539,7 +539,7 @@ export default function DreamScrollApp() {
   };
 
   const getRecurringSymbols = () => {
-    const symbolCounts = {};
+    const symbolCounts: { [key: string]: number } = {};
     dreams.forEach(dream => {
       dream.symbols.forEach(symbol => {
         symbolCounts[symbol] = (symbolCounts[symbol] || 0) + 1;
