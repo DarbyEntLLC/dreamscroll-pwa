@@ -501,7 +501,7 @@ export default function DreamScrollApp() {
     filtered.sort((a, b) => {
       switch (sortBy) {
         case 'date':
-          return new Date(b.timestamp) - new Date(a.timestamp);
+          return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
         case 'title':
           return a.title.localeCompare(b.title);
         case 'confidence':
@@ -509,7 +509,7 @@ export default function DreamScrollApp() {
         case 'category':
           return a.category.localeCompare(b.category);
         default:
-          return new Date(b.timestamp) - new Date(a.timestamp);
+          return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
       }
     });
 
