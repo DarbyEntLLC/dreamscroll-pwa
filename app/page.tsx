@@ -57,10 +57,10 @@ export default function DreamScrollApp() {
   const [darkMode, setDarkMode] = useState(true);
   
   // Refs
-  const mediaRecorderRef = useRef(null);
-  const audioChunksRef = useRef([]);
-  const recognitionRef = useRef(null);
-  const timerRef = useRef(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Enhanced Sample Dreams Data
   const [dreams, setDreams] = useState([
@@ -201,11 +201,17 @@ export default function DreamScrollApp() {
         setRecordingTimer(prev => prev + 1);
       }, 1000);
     } else {
-      clearInterval(timerRef.current);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
       setRecordingTimer(0);
     }
     
-    return () => clearInterval(timerRef.current);
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
   }, [isRecording]);
 
   // Format timer
@@ -261,45 +267,47 @@ export default function DreamScrollApp() {
   const startSpeechRecognition = () => {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) return;
     
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     recognitionRef.current = new SpeechRecognition();
     
-    recognitionRef.current.continuous = true;
-    recognitionRef.current.interimResults = true;
-    recognitionRef.current.lang = 'en-US';
-    
-    recognitionRef.current.onstart = () => {
-      setIsListening(true);
-    };
-    
-    recognitionRef.current.onresult = (event) => {
-      let finalTranscript = '';
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        if (event.results[i].isFinal) {
-          finalTranscript += event.results[i][0].transcript;
-        }
-      }
+    if (recognitionRef.current) {
+      recognitionRef.current.continuous = true;
+      recognitionRef.current.interimResults = true;
+      recognitionRef.current.lang = 'en-US';
       
-      if (finalTranscript) {
-        setDreamText(prev => prev + ' ' + finalTranscript);
-      }
-    };
-    
-    recognitionRef.current.onerror = (event) => {
-      console.error('Speech recognition error:', event.error);
-      setIsListening(false);
-      addNotification('Speech recognition error. Please try again.', 'error');
-    };
-    
-    recognitionRef.current.onend = () => {
-      setIsListening(false);
-    };
-    
-    recognitionRef.current.start();
+      recognitionRef.current.onstart = () => {
+        setIsListening(true);
+      };
+      
+      recognitionRef.current.onresult = (event: any) => {
+        let finalTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          }
+        }
+        
+        if (finalTranscript) {
+          setDreamText(prev => prev + ' ' + finalTranscript);
+        }
+      };
+      
+      recognitionRef.current.onerror = (event: any) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+        addNotification('Speech recognition error. Please try again.', 'error');
+      };
+      
+      recognitionRef.current.onend = () => {
+        setIsListening(false);
+      };
+      
+      recognitionRef.current.start();
+    }
   };
 
   // Enhanced dream processing function
-  const generateAdvancedInterpretation = async (dreamText) => {
+  const generateAdvancedInterpretation = async (dreamText: string) => {
     setIsProcessing(true);
     setCurrentScreen('interpretation');
     
@@ -337,26 +345,26 @@ export default function DreamScrollApp() {
   };
 
   // Helper functions for dream analysis
-  const extractDreamTitle = (text) => {
+  const extractDreamTitle = (text: string) => {
     const words = text.split(' ').slice(0, 4);
     return words.join(' ') + (text.split(' ').length > 4 ? '...' : '');
   };
 
-  const generateThemes = (text) => {
+  const generateThemes = (text: string) => {
     const themes = ["Spiritual Growth", "Divine Guidance", "Personal Journey", "Faith Challenge", "Divine Promise"];
     return themes.slice(0, Math.floor(Math.random() * 3) + 2);
   };
 
-  const extractSymbols = (text) => {
+  const extractSymbols = (text: string) => {
     const commonSymbols = ["Light", "Water", "Mountain", "Tree", "Door", "Path", "Crown", "Book"];
     return commonSymbols.slice(0, Math.floor(Math.random() * 4) + 2);
   };
 
-  const generateInterpretation = (text) => {
+  const generateInterpretation = (text: string) => {
     return "Your dream contains meaningful spiritual symbolism that suggests God is speaking to you about growth and transformation in your spiritual journey. The elements you described indicate divine guidance and encouragement for the path ahead.";
   };
 
-  const generateBiblicalRefs = (text) => {
+  const generateBiblicalRefs = (text: string) => {
     return [
       {
         verse: "Psalm 119:105",
@@ -366,7 +374,7 @@ export default function DreamScrollApp() {
     ];
   };
 
-  const analyzeEmotionalTone = (text) => {
+  const analyzeEmotionalTone = (text: string) => {
     const positiveWords = ['joy', 'peace', 'light', 'beautiful', 'love'];
     const negativeWords = ['fear', 'dark', 'lost', 'angry', 'sad'];
     
@@ -378,21 +386,21 @@ export default function DreamScrollApp() {
     return 'Mixed';
   };
 
-  const analyzeMood = (text) => {
+  const analyzeMood = (text: string) => {
     return 'Contemplative';
   };
 
-  const categorize = (text) => {
+  const categorize = (text: string) => {
     const categories = ['Prophetic', 'Encouragement', 'Warning', 'Spiritual Life', 'Revelation'];
     return categories[Math.floor(Math.random() * categories.length)];
   };
 
-  const generateTags = (text) => {
+  const generateTags = (text: string) => {
     return ['spiritual', 'guidance', 'growth'];
   };
 
   // Notification system
-  const addNotification = (message, type = 'info') => {
+  const addNotification = (message: string, type: 'info' | 'success' | 'error' = 'info') => {
     const id = Date.now();
     setNotifications(prev => [...prev, { id, message, type, timestamp: new Date() }]);
     setTimeout(() => {
@@ -401,7 +409,7 @@ export default function DreamScrollApp() {
   };
 
   // Text-to-speech function
-  const speakText = (text) => {
+  const speakText = (text: string) => {
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.rate = readingSpeed;
@@ -410,7 +418,7 @@ export default function DreamScrollApp() {
   };
 
   // Helper functions
-  const toggleBookmark = (dreamId) => {
+  const toggleBookmark = (dreamId: number) => {
     setDreams(prev => prev.map(dream => 
       dream.id === dreamId 
         ? { ...dream, isBookmarked: !dream.isBookmarked }
@@ -418,12 +426,12 @@ export default function DreamScrollApp() {
     ));
   };
 
-  const deleteDream = (dreamId) => {
+  const deleteDream = (dreamId: number) => {
     setDreams(prev => prev.filter(dream => dream.id !== dreamId));
     addNotification('Dream deleted', 'info');
   };
 
-  const copyToClipboard = (text) => {
+  const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text).then(() => {
       addNotification('Copied to clipboard!', 'success');
     });
