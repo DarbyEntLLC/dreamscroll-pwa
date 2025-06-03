@@ -7,15 +7,14 @@ module.exports = {
   ],
   theme: {
     extend: {
-      backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic':
-          'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+      backdropBlur: {
+        'xs': '2px',
+        'xl': '24px',
+        '2xl': '40px',
+        '3xl': '64px',
       },
-      animation: {
-        'bounce': 'bounce 1s infinite',
-        'pulse': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'spin': 'spin 1s linear infinite',
+      supports: {
+        'backdrop-blur': 'backdrop-filter: blur(0)',
       },
     },
   },
