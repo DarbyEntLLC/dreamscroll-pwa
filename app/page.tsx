@@ -681,7 +681,7 @@ export default function DreamScrollApp() {
     const recentDreams = dreams.slice(0, 2);
     
     return (
-      <div className="max-w-sm mx-auto bg-gray-900 min-h-screen">
+      <div className="w-full max-w-sm md:max-w-6xl mx-auto bg-gray-900 min-h-screen">
         <NotificationBar />
         <div className="min-h-screen">
           <div className="bg-gray-800/50 backdrop-blur-xl border-b border-gray-700/50 p-6">
