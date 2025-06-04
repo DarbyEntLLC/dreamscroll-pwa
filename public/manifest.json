@@ -3,7 +3,7 @@
   "short_name": "DreamScroll",
   "description": "AI-powered biblical dream interpretation with voice recording",
   "start_url": "/",
-  "display": "standalone",
+  "display": "browser",
   "background_color": "#0f172a",
   "theme_color": "#8b5cf6",
   "orientation": "portrait",
