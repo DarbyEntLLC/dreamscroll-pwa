@@ -7,6 +7,7 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'DreamScroll - Biblical Dream Interpretation',
   description: 'Discover the spiritual meaning behind your dreams',
+  viewport: 'width=device-width, initial-scale=1', // ← Add this!
 }
 
 export default function RootLayout({
@@ -16,11 +17,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        <style dangerouslySetInnerHTML={{
-          __html: `body { background: red !important; color: white !important; }`
-        }} />
-      </head>
       <body className={inter.className}>{children}</body>
     </html>
   )
