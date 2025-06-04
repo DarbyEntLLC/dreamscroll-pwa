@@ -2,11 +2,6 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 
-// Add this temporary inline style for testing
-const testStyle = `
-  body { background: red !important; color: white !important; }
-`;
-
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
@@ -21,6 +16,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <style dangerouslySetInnerHTML={{
+          __html: `body { background: red !important; color: white !important; }`
+        }} />
+      </head>
       <body className={inter.className}>{children}</body>
     </html>
   )
