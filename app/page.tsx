@@ -555,7 +555,7 @@ export default function DreamScrollApp() {
   // Notification Component
   const NotificationBar = () => (
     notifications.length > 0 && (
-      <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-sm px-4">
+      <div className="min-h-screen w-full max-w-none">
         {notifications.map(notification => (
           <div
             key={notification.id}
