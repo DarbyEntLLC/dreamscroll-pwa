@@ -18,13 +18,13 @@ export default function Page() {
     }
   }, []);
 
-  const addNotification = (message, type = 'info') => {
-    const id = Date.now();
-    setNotifications(prev => [...prev, { id, message, type }]);
-    setTimeout(() => {
-      setNotifications(prev => prev.filter(n => n.id !== id));
-    }, 3000);
-  };
+  const addNotification = (message: string, type: string = 'info') => {
+  const id = Date.now();
+  setNotifications(prev => [...prev, { id, message, type }]);
+  setTimeout(() => {
+    setNotifications(prev => prev.filter(n => n.id !== id));
+  }, 3000);
+};
 
   const startRecording = () => {
     setIsRecording(true);
