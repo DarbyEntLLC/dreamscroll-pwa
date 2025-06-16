@@ -9,7 +9,6 @@ export default function Page() {
   const [dreamText, setDreamText] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [audioSupported, setAudioSupported] = useState(false);
-  const [notifications, setNotifications] = useState([]);
 
   // Check for audio support
   useEffect(() => {
