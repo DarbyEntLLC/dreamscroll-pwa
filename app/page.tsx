@@ -18,14 +18,15 @@ export default function Page() {
     }
   }, []);
 
-  const addNotification = (message: string, type: string = 'info') => {
+  const [notifications, setNotifications] = useState<Array<{id: number, message: string, type: string}>>([]);
+
+const addNotification = (message: string, type: string = 'info') => {
   const id = Date.now();
   setNotifications(prev => [...prev, { id, message, type }]);
   setTimeout(() => {
     setNotifications(prev => prev.filter(n => n.id !== id));
   }, 3000);
 };
-
   const startRecording = () => {
     setIsRecording(true);
     addNotification('Recording started! 🎤', 'success');
