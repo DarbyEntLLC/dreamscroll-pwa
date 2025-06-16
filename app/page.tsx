@@ -537,6 +537,25 @@ export default function DreamScrollApp() {
               )}
             </div>
             
+              />
+              {authMode === 'signup' && (
+                <input
+                  type="password"
+                  placeholder="Confirm password"
+                  className={`w-full p-4 rounded-xl ${themeClasses.inputBackground} border ${themeClasses.inputBorder} ${themeClasses.textPrimary} placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors`}
+                />
+              )}
+            </div>
+            
+            {authMode === 'signin' && (
+              <button
+                onClick={() => addNotification('Password reset feature coming soon!', 'info')}
+                className="w-full text-blue-400 hover:text-blue-300 text-sm mb-4 transition-all"
+              >
+                Forgot password?
+              </button>
+            )}
+            
             <button
               onClick={() => {
                 setIsAuthenticated(true);
@@ -546,16 +565,6 @@ export default function DreamScrollApp() {
               className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 rounded-xl transition-all mb-4"
             >
               {authMode === 'signin' ? 'Sign In' : 'Create Account'}
-            </button>
-            
-            <button
-              onClick={() => setAuthMode(authMode === 'signin' ? 'signup' : 'signin')}
-              className="w-full text-blue-400 hover:text-blue-300 py-2 transition-all"
-            >
-              {authMode === 'signin' 
-                ? "Don't have an account? Sign up" 
-                : "Already have an account? Sign in"
-              }
             </button>
           </div>
           
