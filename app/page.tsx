@@ -779,8 +779,34 @@ export default function DreamScrollApp() {
                 Your dreams will be interpreted using {userProfile.selectedLLM}
               </p>
             </div>
-            
-            <div className={`${themeClasses.cardBackground} backdrop-blur-xl rounded-2xl p-6 border ${themeClasses.cardBorder}`}>
+
+<div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => setDreamText('I was flying above clouds, feeling free and peaceful...')}
+                className={`${themeClasses.buttonSecondary} p-3 rounded-xl text-sm ${themeClasses.textSecondary} hover:scale-105 transition-all`}
+              >
+                🦅 Flying Dream
+              </button>
+              <button
+                onClick={() => setDreamText('I stood beside a vast ocean, waves gently touching my feet...')}
+                className={`${themeClasses.buttonSecondary} p-3 rounded-xl text-sm ${themeClasses.textSecondary} hover:scale-105 transition-all`}
+              >
+                🌊 Water Dream
+              </button>
+              <button
+                onClick={() => setDreamText('A bright light appeared before me, warm and comforting...')}
+                className={`${themeClasses.buttonSecondary} p-3 rounded-xl text-sm ${themeClasses.textSecondary} hover:scale-105 transition-all`}
+              >
+                ✨ Light Vision
+              </button>
+              <button
+                onClick={() => setDreamText('I heard a voice calling my name, clear and peaceful...')}
+                className={`${themeClasses.buttonSecondary} p-3 rounded-xl text-sm ${themeClasses.textSecondary} hover:scale-105 transition-all`}
+              >
+                🔊 Voice/Message
+              </button>
+            </div>            
+            <div className={`${themeClasses.cardBackground} backdrop-blur-xl rounded-2xl p-6 border ${themeClasses.cardBorder}`}>        
               <h3 className={`text-lg font-semibold ${themeClasses.textPrimary} mb-6`}>Describe Your Dream</h3>
               <div className="text-center mb-6">
                 <div className="relative inline-block">
