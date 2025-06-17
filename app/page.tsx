@@ -74,22 +74,6 @@ const DreamScrollLogo = ({ size = 40, className = "" }: { size?: number; classNa
   </div>
 );
 
-export default function DreamScrollApp() {
-  // Core State
-  const [currentScreen, setCurrentScreen] = useState('home');
-  const [isOnboardingComplete, setIsOnboardingComplete] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [onboardingStep, setOnboardingStep] = useState(0);
-  const [authMode, setAuthMode] = useState('signin');
-  
-  // Dream Input State
-  const [dreamText, setDreamText] = useState('');
-  const [isRecording, setIsRecording] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [recordingTimer, setRecordingTimer] = useState(0);
-  const [isListening, setIsListening] = useState(false);
-  const [audioSupported, setAudioSupported] = useState(false);
-
 // Notification Bar Component
 function NotificationBar() {
   if (notifications.length === 0) return null;
@@ -121,7 +105,73 @@ function NotificationBar() {
     </div>
   );
 }
+
+  // Notification Component
+  const NotificationBar = () => (
+    notifications.length > 0 && (
+      <div className="w-full max-w-sm md:max-w-6xl mx-auto">
+        {notifications.map(notification => (
+          <div
+            key={notification.id}
+            className={`mb-2 p-3 rounded-xl backdrop-blur-xl border ${
+              notification.type === 'success' ? 'bg-green-500/20 border-green-500/30 text-green-300' :
+              notification.type === 'error' ? 'bg-red-500/20 border-red-500/30 text-red-300' :
+              'bg-blue-500/20 border-blue-500/30 text-blue-300'
+            } animate-in slide-in-from-top duration-300`}
+          >
+            {notification.message}
+          </div>
+        ))}
+      </div>
+    )
+  );
+
+  // Bottom Navigation Component
+  const BottomNav = ({ activeScreen }: { activeScreen: string }) => (
+    <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-sm bg-gray-800/90 backdrop-blur-xl border-t border-gray-700/50">
+      <div className="flex items-center justify-around py-2">
+        {[
+          { id: 'home', icon: Home, label: 'Home' },
+          { id: 'journal', icon: BookOpen, label: 'Journal' },
+          { id: 'input', icon: PlusCircle, label: 'Record' },
+          { id: 'trends', icon: TrendingUp, label: 'Trends' },
+          { id: 'profile', icon: User, label: 'Profile' }
+        ].map(({ id, icon: Icon, label }) => (
+          <button
+            key={id}
+            onClick={() => setCurrentScreen(id)}
+            className={`flex flex-col items-center py-2 px-3 rounded-lg transition-all ${
+              activeScreen === id 
+                ? 'text-blue-400 bg-blue-500/20' 
+                : 'text-gray-400 hover:text-gray-300'
+            }`}
+          >
+            <Icon className="w-5 h-5 mb-1" />
+            <span className="text-xs font-medium">{label}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
+// Main App Component
+export default function DreamScrollApp() {
   
+  // Core State
+  const [currentScreen, setCurrentScreen] = useState('home');
+  const [isOnboardingComplete, setIsOnboardingComplete] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [onboardingStep, setOnboardingStep] = useState(0);
+  const [authMode, setAuthMode] = useState('signin');
+  
+  // Dream Input State
+  const [dreamText, setDreamText] = useState('');
+  const [isRecording, setIsRecording] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [recordingTimer, setRecordingTimer] = useState(0);
+  const [isListening, setIsListening] = useState(false);
+  const [audioSupported, setAudioSupported] = useState(false);
+
   // Navigation State
   const [selectedDream, setSelectedDream] = useState<Dream | null>(null);
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
@@ -168,7 +218,7 @@ function NotificationBar() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Enhanced Sample Dreams Data
+    // Enhanced Sample Dreams Data
   const [dreams, setDreams] = useState<Dream[]>([
     {
       id: 1,
@@ -466,68 +516,11 @@ function NotificationBar() {
     addNotification('Profile updated successfully!', 'success');
   };
 
-  // Helper functions
-  const toggleBookmark = (dreamId: number) => {
-    setDreams(prev => prev.map(dream => 
-      dream.id === dreamId 
-        ? { ...dream, isBookmarked: !dream.isBookmarked }
-        : dream
-    ));
-  };
-
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text).then(() => {
       addNotification('Copied to clipboard!', 'success');
     });
   };
-
-  // Notification Component
-  const NotificationBar = () => (
-    notifications.length > 0 && (
-      <div className="w-full max-w-sm md:max-w-6xl mx-auto">
-        {notifications.map(notification => (
-          <div
-            key={notification.id}
-            className={`mb-2 p-3 rounded-xl backdrop-blur-xl border ${
-              notification.type === 'success' ? 'bg-green-500/20 border-green-500/30 text-green-300' :
-              notification.type === 'error' ? 'bg-red-500/20 border-red-500/30 text-red-300' :
-              'bg-blue-500/20 border-blue-500/30 text-blue-300'
-            } animate-in slide-in-from-top duration-300`}
-          >
-            {notification.message}
-          </div>
-        ))}
-      </div>
-    )
-  );
-
-  // Bottom Navigation Component
-  const BottomNav = ({ activeScreen }: { activeScreen: string }) => (
-    <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-sm bg-gray-800/90 backdrop-blur-xl border-t border-gray-700/50">
-      <div className="flex items-center justify-around py-2">
-        {[
-          { id: 'home', icon: Home, label: 'Home' },
-          { id: 'journal', icon: BookOpen, label: 'Journal' },
-          { id: 'input', icon: PlusCircle, label: 'Record' },
-          { id: 'trends', icon: TrendingUp, label: 'Trends' },
-          { id: 'profile', icon: User, label: 'Profile' }
-        ].map(({ id, icon: Icon, label }) => (
-          <button
-            key={id}
-            onClick={() => setCurrentScreen(id)}
-            className={`flex flex-col items-center py-2 px-3 rounded-lg transition-all ${
-              activeScreen === id 
-                ? 'text-blue-400 bg-blue-500/20' 
-                : 'text-gray-400 hover:text-gray-300'
-            }`}
-          >
-            <Icon className="w-5 h-5 mb-1" />
-            <span className="text-xs font-medium">{label}</span>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
 
   // AUTH SCREEN
   if (currentScreen === 'auth') {
