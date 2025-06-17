@@ -89,6 +89,38 @@ export default function DreamScrollApp() {
   const [recordingTimer, setRecordingTimer] = useState(0);
   const [isListening, setIsListening] = useState(false);
   const [audioSupported, setAudioSupported] = useState(false);
+
+// Notification Bar Component
+const NotificationBar = () => {
+  if (notifications.length === 0) return null;
+  
+  return (
+    <div className="fixed top-0 left-0 right-0 z-50 space-y-2 p-4">
+      {notifications.map((notification) => (
+        <div
+          key={notification.id}
+          className={`
+            mx-auto max-w-sm backdrop-blur-lg rounded-lg p-4 shadow-lg 
+            transform transition-all duration-500 animate-slide-down
+            ${notification.type === 'success' ? 'bg-green-500/90 text-white' : ''}
+            ${notification.type === 'error' ? 'bg-red-500/90 text-white' : ''}
+            ${notification.type === 'info' ? 'bg-blue-500/90 text-white' : ''}
+          `}
+        >
+          <div className="flex items-center justify-between">
+            <p className="font-medium">{notification.message}</p>
+            <button
+              onClick={() => removeNotification(notification.id)}
+              className="ml-4 hover:opacity-80 transition-opacity"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
   
   // Navigation State
   const [selectedDream, setSelectedDream] = useState<Dream | null>(null);
