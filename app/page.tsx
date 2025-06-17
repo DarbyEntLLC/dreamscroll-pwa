@@ -91,7 +91,7 @@ export default function DreamScrollApp() {
   const [audioSupported, setAudioSupported] = useState(false);
 
 // Notification Bar Component
-const NotificationBar = () => {
+function NotificationBar() {
   if (notifications.length === 0) return null;
   
   return (
@@ -120,7 +120,7 @@ const NotificationBar = () => {
       ))}
     </div>
   );
-};
+}
   
   // Navigation State
   const [selectedDream, setSelectedDream] = useState<Dream | null>(null);
