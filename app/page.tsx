@@ -533,7 +533,7 @@ function NotificationBar() {
   if (currentScreen === 'auth') {
     return (
       <div className={`w-full max-w-sm md:max-w-6xl mx-auto ${themeClasses.background} min-h-screen`}>
-        <NotificationBar />
+       {/* <NotificationBar /> */}
         <div className="min-h-screen flex flex-col">
           <div className="flex-1 flex flex-col justify-center p-8">
             <div className="text-center mb-8">
