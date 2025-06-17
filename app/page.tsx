@@ -811,7 +811,7 @@ export default function DreamScrollApp() {
               <Bookmark
                 className={`w-6 h-6 cursor-pointer ${dream.isBookmarked ? 'text-yellow-400' : 'text-gray-400'}`}
                 onClick={() => toggleBookmark(dream.id)}
-                title={dream.isBookmarked ? "Remove bookmark" : "Bookmark"}
+                {dream.isBookmarked ? "Remove bookmark" : "Bookmark"}
               />
             </div>
             <div className={`${themeClasses.cardBackground} rounded-xl p-4 border ${themeClasses.cardBorder}`}>
