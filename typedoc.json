@@ -1,0 +1,18 @@
+{
+  "entryPoints": [
+    "app",
+    "components",
+    "contexts",
+    "lib",
+    "services"
+  ],
+  "entryPointStrategy": "expand",
+  "exclude": [
+    "app/page.tsx",
+    "components/dreams/DreamCard.tsx"
+  ],
+  "out": "docs/api",
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "skipErrorChecking": true
+}

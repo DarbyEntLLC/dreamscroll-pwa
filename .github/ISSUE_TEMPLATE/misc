@@ -1,0 +1,8 @@
+// Bad comment:
+// Process the data
+processData(data);
+
+// Good comment:
+// Convert raw dream text to structured format for AI processing
+// This strips HTML, normalizes whitespace, and extracts key symbols
+const structuredDream = processData(data);

@@ -1,5 +1,7 @@
 'use client';
 
+'use client';
+
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Moon, Sun, Star, Heart, BookOpen, Mic, MicOff, Send, Search,
@@ -10,131 +12,18 @@ import {
   Trash2, Edit3, Play, Pause, RefreshCw, Eye, EyeOff, Camera, Save
 } from 'lucide-react';
 
+// Import our new components
+import { DreamScrollLogo } from '@/components/ui/DreamScrollLogo';
+import { NotificationBar } from '@/components/ui/NotificationBar';
+import { BottomNav } from '@/components/ui/BottomNav';
+import { Dream, Notification, UserProfile } from '@/lib/types';
+
 declare global {
   interface Window {
     SpeechRecognition: any;
     webkitSpeechRecognition: any;
   }
 }
-
-interface BiblicalRef {
-  verse: string;
-  text: string;
-  relevance: string;
-}
-interface Dream {
-  id: number;
-  title: string;
-  content: string;
-  date: string;
-  timestamp: Date;
-  themes: string[];
-  symbols: string[];
-  interpretation: string;
-  biblicalRefs: BiblicalRef[];
-  emotionalTone: string;
-  mood: string;
-  confidence: number;
-  isBookmarked: boolean;
-  category: string;
-  tags: string[];
-  audioNotes: any;
-  lastViewed: Date;
-}
-interface Notification {
-  id: number;
-  message: string;
-  type: 'info' | 'success' | 'error';
-  timestamp: Date;
-}
-interface UserProfile {
-  name: string;
-  subtitle: string;
-  profileImage: string;
-  selectedLLM: string;
-}
-
-const DreamScrollLogo = ({ size = 40, className = "" }: { size?: number; className?: string }) => (
-  <div className={`relative ${className}`} style={{ width: size, height: size }}>
-    <div
-      className="absolute inset-0 bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 rounded-full"
-      style={{
-        background: 'linear-gradient(135deg, #60A5FA 0%, #A855F7 50%, #EC4899 100%)'
-      }}
-    />
-    <div className="absolute inset-1 bg-gray-900 rounded-full flex items-center justify-center">
-      <Moon className="text-white" style={{ width: size * 0.4, height: size * 0.4 }} />
-    </div>
-  </div>
-);
-
-const NotificationBar = ({
-  notifications,
-  removeNotification
-}: {
-  notifications: Notification[];
-  removeNotification: (id: number) => void;
-}) => (
-  notifications.length > 0 && (
-    <div className="fixed top-0 left-0 right-0 z-50 space-y-2 p-4">
-      {notifications.map((notification) => (
-        <div
-          key={notification.id}
-          className={`
-            mx-auto max-w-sm backdrop-blur-lg rounded-lg p-4 shadow-lg 
-            transform transition-all duration-500 animate-slide-down
-            ${notification.type === 'success' ? 'bg-green-500/90 text-white' : ''}
-            ${notification.type === 'error' ? 'bg-red-500/90 text-white' : ''}
-            ${notification.type === 'info' ? 'bg-blue-500/90 text-white' : ''}
-          `}
-        >
-          <div className="flex items-center justify-between">
-            <p className="font-medium">{notification.message}</p>
-            <button
-              onClick={() => removeNotification(notification.id)}
-              className="ml-4 hover:opacity-80 transition-opacity"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      ))}
-    </div>
-  )
-);
-
-const BottomNav = ({
-  activeScreen,
-  setCurrentScreen
-}: {
-  activeScreen: string;
-  setCurrentScreen: (screen: string) => void;
-}) => (
-  <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-sm bg-gray-800/90 backdrop-blur-xl border-t border-gray-700/50">
-    <div className="flex items-center justify-around py-2">
-      {[
-        { id: 'home', icon: Home, label: 'Home' },
-        { id: 'journal', icon: BookOpen, label: 'Journal' },
-        { id: 'input', icon: PlusCircle, label: 'Record' },
-        { id: 'trends', icon: TrendingUp, label: 'Trends' },
-        { id: 'profile', icon: User, label: 'Profile' }
-      ].map(({ id, icon: Icon, label }) => (
-        <button
-          key={id}
-          onClick={() => setCurrentScreen(id)}
-          className={`flex flex-col items-center py-2 px-3 rounded-lg transition-all ${
-            activeScreen === id 
-              ? 'text-blue-400 bg-blue-500/20' 
-              : 'text-gray-400 hover:text-gray-300'
-          }`}
-        >
-          <Icon className="w-5 h-5 mb-1" />
-          <span className="text-xs font-medium">{label}</span>
-        </button>
-      ))}
-    </div>
-  </div>
-);
 
 export default function DreamScrollApp() {
   // --- State variables ---
