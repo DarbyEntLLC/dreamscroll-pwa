@@ -52,9 +52,6 @@ next-env.d.ts
 .DS_Store
 Thumbs.db
 
-# Dependencies
-node_modules/
-
 # Build outputs
 .next/
 out/
