@@ -75,7 +75,7 @@ export function DreamCard({
         </span>
         
         <time className="text-xs text-gray-400" dateTime={dream.timestamp.toISOString()}>
-          {formatDate(dream.timestamp)}
+          {formatDate(dream.timestamp.toISOString())}
         </time>
       </div>
 

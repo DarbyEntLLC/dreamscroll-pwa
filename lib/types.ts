@@ -22,9 +22,8 @@ export interface Dream {
   isBookmarked: boolean;
   category: string;
   tags: string[];
-  audioNotes?: Blob | null;
+  audioNotes: any;
   lastViewed: Date;
-  userId?: string; // For multi-user support
 }
 
 export interface Notification {
@@ -35,30 +34,8 @@ export interface Notification {
 }
 
 export interface UserProfile {
-  id?: string;
   name: string;
   subtitle: string;
   profileImage: string;
   selectedLLM: 'GPT-4' | 'Claude 3' | 'Gemini 1.5';
-  email?: string;
-  createdAt?: Date;
-  subscription?: 'free' | 'premium' | 'pro';
-}
-
-export type Screen = 'home' | 'journal' | 'input' | 'trends' | 'profile' | 'auth' | 'search' | 'interpretation';
-
-export type AuthMode = 'signin' | 'signup';
-
-export interface ThemeClasses {
-  background: string;
-  cardBackground: string;
-  cardBorder: string;
-  textPrimary: string;
-  textSecondary: string;
-  textMuted: string;
-  inputBackground: string;
-  inputBorder: string;
-  buttonSecondary: string;
-  navBackground: string;
-  navBorder: string;
 }

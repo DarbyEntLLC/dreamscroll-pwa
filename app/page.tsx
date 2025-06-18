@@ -1,7 +1,5 @@
 'use client';
 
-'use client';
-
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Moon, Sun, Star, Heart, BookOpen, Mic, MicOff, Send, Search,
@@ -11,12 +9,10 @@ import {
   Volume2, VolumeX, Copy, ChevronDown, ChevronUp, Bookmark,
   Trash2, Edit3, Play, Pause, RefreshCw, Eye, EyeOff, Camera, Save
 } from 'lucide-react';
-
-// Import our new components
 import { DreamScrollLogo } from '@/components/ui/DreamScrollLogo';
 import { NotificationBar } from '@/components/ui/NotificationBar';
 import { BottomNav } from '@/components/ui/BottomNav';
-import { Dream, Notification, UserProfile } from '@/lib/types';
+import type { Dream, Notification, UserProfile, BiblicalRef } from '@/lib/types';
 
 declare global {
   interface Window {
@@ -204,37 +200,82 @@ export default function DreamScrollApp() {
   };
 
   // --- Dream analysis & AI simulation helpers ---
-  const extractDreamTitle = (text: string) => {
-    const words = text.split(' ').slice(0, 4);
-    return words.join(' ') + (text.split(' ').length > 4 ? '...' : '');
-  };
-  const generateThemes = (text: string) => {
-    const themes = ["Spiritual Growth", "Divine Guidance", "Personal Journey"];
-    return themes.slice(0, Math.floor(Math.random() * 2) + 1);
-  };
-  const extractSymbols = (text: string) => {
-    const commonSymbols = ["Light", "Water", "Mountain", "Tree"];
-    return commonSymbols.slice(0, Math.floor(Math.random() * 2) + 1);
-  };
-  const generateInterpretation = (text: string) => {
-    return "Your dream contains meaningful spiritual symbolism that suggests divine guidance and growth in your spiritual journey.";
-  };
-  const generateBiblicalRefs = (text: string) => {
-    return [
-      {
-        verse: "Psalm 119:105",
-        text: "Your word is a lamp for my feet, a light on my path.",
-        relevance: "God provides guidance and illumination for our spiritual journey."
-      }
-    ];
-  };
-  const analyzeEmotionalTone = (text: string) => 'Positive';
-  const analyzeMood = (text: string) => 'Contemplative';
-  const categorize = (text: string) => {
-    const categories = ['Prophetic', 'Encouragement', 'Spiritual Life'];
-    return categories[Math.floor(Math.random() * categories.length)];
-  };
-  const generateTags = (text: string) => ['spiritual', 'guidance'];
+ // --- Dream analysis & AI simulation helpers ---
+const extractDreamTitle = (text: string) => {
+  const words = text.split(' ').slice(0, 4);
+  return words.join(' ') + (text.split(' ').length > 4 ? '...' : '');
+};
+
+// Add these missing functions:
+const generateThemes = (content: string): string[] => {
+  const themes = [];
+  const lowerContent = content.toLowerCase();
+  
+  if (lowerContent.includes('water') || lowerContent.includes('ocean')) themes.push('Cleansing');
+  if (lowerContent.includes('fly') || lowerContent.includes('soar')) themes.push('Freedom');
+  if (lowerContent.includes('mountain') || lowerContent.includes('climb')) themes.push('Obstacles');
+  if (lowerContent.includes('light') || lowerContent.includes('bright')) themes.push('Revelation');
+  if (lowerContent.includes('dark') || lowerContent.includes('shadow')) themes.push('Unknown');
+  
+  return themes.slice(0, 3); // Return max 3 themes
+};
+
+const extractSymbols = (content: string): string[] => {
+  const symbols = [];
+  const lowerContent = content.toLowerCase();
+  
+  if (lowerContent.includes('water')) symbols.push('💧 Water');
+  if (lowerContent.includes('fire')) symbols.push('🔥 Fire');
+  if (lowerContent.includes('tree')) symbols.push('🌳 Tree');
+  if (lowerContent.includes('door')) symbols.push('🚪 Door');
+  if (lowerContent.includes('key')) symbols.push('🔑 Key');
+  
+  return symbols;
+};
+
+const analyzeEmotionalTone = (content: string): string => {
+  const lowerContent = content.toLowerCase();
+  
+  if (lowerContent.includes('peace') || lowerContent.includes('calm')) return 'Peaceful';
+  if (lowerContent.includes('fear') || lowerContent.includes('afraid')) return 'Anxious';
+  if (lowerContent.includes('joy') || lowerContent.includes('happy')) return 'Joyful';
+  if (lowerContent.includes('sad') || lowerContent.includes('cry')) return 'Sorrowful';
+  
+  return 'Neutral';
+};
+
+const analyzeMood = (content: string): string => {
+  const tone = analyzeEmotionalTone(content);
+  return tone === 'Peaceful' || tone === 'Joyful' ? 'Positive' : tone === 'Neutral' ? 'Neutral' : 'Challenging';
+};
+
+const categorize = (content: string): string => {
+  const lowerContent = content.toLowerCase();
+  
+  if (lowerContent.includes('future') || lowerContent.includes('vision')) return 'prophetic';
+  if (lowerContent.includes('warning') || lowerContent.includes('danger')) return 'warning';
+  if (lowerContent.includes('peace') || lowerContent.includes('comfort')) return 'encouragement';
+  
+  return 'revelation';
+};
+
+const generateTags = (content: string, themes: string[], symbols: string[]): string[] => {
+  const tags = [...themes];
+  
+  // Add time-based tags
+  const now = new Date();
+  const hour = now.getHours();
+  if (hour >= 22 || hour <= 4) tags.push('Late Night');
+  else if (hour >= 5 && hour <= 8) tags.push('Early Morning');
+  
+  return Array.from(new Set(tags)); // Remove duplicates
+};
+
+// If you have processData function being called somewhere, add it:
+const processData = (data: any) => {
+  // Simple pass-through for now
+  return data;
+};
 
   // --- Audio Recording Helpers ---
   const startRealRecording = async () => {
@@ -295,6 +336,62 @@ export default function DreamScrollApp() {
       recognitionRef.current.start();
     }
   };
+// Add this with your other helper functions
+const generateInterpretation = (content: string): string => {
+
+  // Simulate AI interpretation based on content
+  const themes = generateThemes(content);
+  const symbols = extractSymbols(content);
+  const tone = analyzeEmotionalTone(content);
+  
+  let interpretation = `This dream appears to contain spiritual significance. `;
+  
+  if (themes.includes('Cleansing')) {
+    interpretation += `The presence of water suggests a season of spiritual cleansing or renewal. `;
+  }
+  if (themes.includes('Freedom')) {
+    interpretation += `Elements of flight or liberation indicate breakthrough and divine release. `;
+  }
+  if (themes.includes('Revelation')) {
+    interpretation += `Light imagery points to divine illumination and understanding. `;
+  }
+  
+  interpretation += `The emotional tone suggests ${tone.toLowerCase()} spiritual dynamics at work. `;
+  interpretation += `Consider seeking divine wisdom for full understanding of this revelation.`;
+  
+  return interpretation;
+};
+
+const generateBiblicalRefs = (content: string): BiblicalRef[] => {
+  const refs: BiblicalRef[] = [];
+  const lowerContent = content.toLowerCase();
+  
+  // Add relevant verses based on content
+  if (lowerContent.includes('water')) {
+    refs.push({
+      verse: "Psalm 42:1",
+      text: "As the deer pants for streams of water, so my soul pants for you, my God",
+      relevance: "Spiritual thirst and divine connection"
+    });
+  }
+  
+  if (lowerContent.includes('light') || lowerContent.includes('bright')) {
+    refs.push({
+      verse: "Psalm 119:105",
+      text: "Your word is a lamp for my feet, a light on my path",
+      relevance: "Divine guidance and revelation"
+    });
+  }
+  
+  // Always include this foundational verse
+  refs.push({
+    verse: "Joel 2:28",
+    text: "I will pour out my Spirit on all people. Your sons and daughters will prophesy, your old men will dream dreams",
+    relevance: "God speaks through dreams and visions"
+  });
+  
+  return refs.slice(0, 3); // Return max 3 references
+};
 
   // --- Generate interpretation (simulate AI, async) ---
   const generateAdvancedInterpretation = async (dreamText: string) => {
@@ -316,7 +413,7 @@ export default function DreamScrollApp() {
         confidence: Math.floor(Math.random() * 20) + 80,
         isBookmarked: false,
         category: categorize(dreamText),
-        tags: generateTags(dreamText),
+        tags: generateTags(dreamText, generateThemes(dreamText), extractSymbols(dreamText)),
         audioNotes: null,
         lastViewed: new Date()
       };
@@ -700,7 +797,6 @@ export default function DreamScrollApp() {
               <Bookmark
                 className={`w-6 h-6 cursor-pointer ${dream.isBookmarked ? 'text-yellow-400' : 'text-gray-400'}`}
                 onClick={() => toggleBookmark(dream.id)}
-                {dream.isBookmarked ? "Remove bookmark" : "Bookmark"}
               />
             </div>
             <div className={`${themeClasses.cardBackground} rounded-xl p-4 border ${themeClasses.cardBorder}`}>
@@ -899,7 +995,7 @@ export default function DreamScrollApp() {
                 <select
                   className={`w-full p-3 rounded-xl border ${themeClasses.inputBackground} ${themeClasses.inputBorder} ${themeClasses.textPrimary} focus:outline-none focus:border-blue-500`}
                   value={userProfile.selectedLLM}
-                  onChange={e => setUserProfile(p => ({ ...p, selectedLLM: e.target.value }))}
+                  onChange={e => setUserProfile(p => ({ ...p, selectedLLM: e.target.value as "GPT-4" | "Claude 3" | "Gemini 1.5" }))}
                 >
                   <option value="GPT-4">GPT-4</option>
                   <option value="Claude 3">Claude 3</option>
