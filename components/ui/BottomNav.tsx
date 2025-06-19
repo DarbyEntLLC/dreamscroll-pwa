@@ -4,7 +4,7 @@ import { Home, BookOpen, PlusCircle, TrendingUp, User } from 'lucide-react';
 
 interface BottomNavProps {
   activeScreen: string;
-  setCurrentScreen: (screen: string) => void;
+  setCurrentScreen: (screen: string) => void;  // Changed from onNavigate
 }
 
 interface NavItem {
